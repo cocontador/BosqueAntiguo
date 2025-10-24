@@ -14,6 +14,9 @@ import com.example.bosqueantiguo.ui.view.FormularioScreen
 import com.example.bosqueantiguo.ui.view.ResumenScreen
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
+import com.example.bosqueantiguo.ui.view.AjustesScreen
+import com.example.bosqueantiguo.ui.view.MainScreen
+import com.example.bosqueantiguo.ui.view.PerfilScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,17 +37,32 @@ class MainActivity : ComponentActivity() {
                     val viewModel: UsuarioViewModel = viewModel(factory = factory)
 
                     // Estructura de navegación
-                    NavHost(navController = navController, startDestination = "formulario") {
+                    NavHost(navController = navController, startDestination = "main") {
+                        composable("main") {
+                            MainScreen(
+                                onNavigateToRegistro = { navController.navigate("formulario") },
+                                onNavigateToPerfil = { navController.navigate("perfil") },
+                                onNavigateToAjustes = { navController.navigate("ajustes") }
+                            )
+                        }
                         composable("formulario") {
                             FormularioScreen(
                                 viewModel = viewModel,
-                                onGuardado = {
-                                    navController.navigate("resumen")
-                                }
+                                onGuardado = { navController.navigate("resumen") },
+                                onNavigateBack = { navController.navigateUp() }
                             )
                         }
                         composable("resumen") {
-                            ResumenScreen(viewModel = viewModel)
+                            ResumenScreen(
+                                viewModel = viewModel,
+                                onNavigateBack = { navController.navigateUp() }
+                            )
+                        }
+                        composable("perfil") {
+                            PerfilScreen(onNavigateBack = { navController.navigateUp() })
+                        }
+                        composable("ajustes") {
+                            AjustesScreen(onNavigateBack = { navController.navigateUp() })
                         }
                     }
                 }
