@@ -48,7 +48,11 @@ fun ResumenScreen(viewModel: UsuarioViewModel = viewModel()) {
             if (listaUsuarios.isEmpty()) {
                 Text("No hay usuarios registrados aún.")
             } else {
-                // tu lista o LazyColumn
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(listaUsuarios) { usuario ->
+                        UsuarioCard(usuario = usuario)
+                    }
+                }
             }
         }
     }

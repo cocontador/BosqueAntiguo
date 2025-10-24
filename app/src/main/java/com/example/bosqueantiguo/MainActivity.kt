@@ -9,9 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
-import com.example.bosqueantiguo.model.AppDatabase
-import com.example.bosqueantiguo.repository.UsuarioRepository
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.FormularioScreen
 import com.example.bosqueantiguo.ui.view.ResumenScreen
@@ -22,14 +19,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Instanciamos la base de datos y el repositorio de Room
-        val database = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "bosqueantiguo_db"
-        ).build()
-
-        val repository = UsuarioRepository(database.usuarioDao())
+        // Obtiene el repositorio desde la clase Application
+        val repository = (application as BosqueAntiguoApp).repository
 
         setContent {
             BosqueAntiguoTheme {
