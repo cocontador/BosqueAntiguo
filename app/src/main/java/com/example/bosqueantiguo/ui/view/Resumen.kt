@@ -5,10 +5,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,13 +22,11 @@ import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 @Composable
 fun ResumenScreen(
     viewModel: UsuarioViewModel = viewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onUsuarioClick: (Int) -> Unit,
+    onAddUsuario: () -> Unit
 ) {
     val listaUsuarios by viewModel.usuarios.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.cargarUsuarios()
-    }
 
     Scaffold(
         topBar = {
@@ -43,6 +41,11 @@ fun ResumenScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddUsuario) {
+                Icon(Icons.Default.Add, contentDescription = "Añadir usuario")
+            }
         }
     ) { padding ->
         Column(
@@ -61,7 +64,8 @@ fun ResumenScreen(
                     items(listaUsuarios) { usuario ->
                         UsuarioCard(
                             usuario = usuario,
-                            onEliminar = { viewModel.eliminarUsuario(usuario) }
+                            onEliminar = { viewModel.eliminarUsuario(usuario) },
+                            onClick = { onUsuarioClick(usuario.id) }
                         )
                     }
                 }
@@ -71,8 +75,9 @@ fun ResumenScreen(
 }
 
 @Composable
-fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit) {
+fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit, onClick: () -> Unit) {
     Card(
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

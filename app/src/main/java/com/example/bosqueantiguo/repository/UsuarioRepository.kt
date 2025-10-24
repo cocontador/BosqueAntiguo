@@ -21,6 +21,13 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
     }
 
     /**
+     * Actualiza un usuario existente en la base de datos.
+     */
+    suspend fun actualizarUsuario(usuario: Usuario) {
+        usuarioDao.actualizarUsuario(usuario)
+    }
+
+    /**
      * Elimina un usuario de la base de datos.
      */
     suspend fun eliminarUsuario(usuario: Usuario) {

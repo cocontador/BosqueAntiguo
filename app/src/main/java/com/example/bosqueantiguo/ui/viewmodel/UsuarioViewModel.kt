@@ -1,5 +1,6 @@
 package com.example.bosqueantiguo.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bosqueantiguo.model.Usuario
@@ -76,6 +77,16 @@ class UsuarioViewModel(
                     errores = UsuarioErrores(),
                     guardadoExitoso = true
                 )
+            }
+        }
+    }
+
+    /** Actualiza la foto de perfil de un usuario específico */
+    fun actualizarFotoUsuario(userId: Int, uri: Uri) {
+        viewModelScope.launch {
+            _usuarios.value.find { it.id == userId }?.let { usuario ->
+                val usuarioActualizado = usuario.copy(fotoUri = uri.toString())
+                repository.actualizarUsuario(usuarioActualizado)
             }
         }
     }

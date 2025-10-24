@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.AjustesScreen
 import com.example.bosqueantiguo.ui.view.FormularioScreen
@@ -47,7 +49,7 @@ class MainActivity : ComponentActivity() {
                         composable("main") {
                             MainScreen(
                                 onNavigateToRegistro = { navController.navigate("formulario") },
-                                onNavigateToPerfil = { navController.navigate("perfil") },
+                                onNavigateToPerfil = { navController.navigate("resumen") },
                                 onNavigateToAjustes = { navController.navigate("ajustes") }
                             )
                         }
@@ -73,17 +75,22 @@ class MainActivity : ComponentActivity() {
                         ) {
                             ResumenScreen(
                                 viewModel = viewModel,
-                                onNavigateBack = { navController.navigateUp() }
+                                onNavigateBack = { navController.navigateUp() },
+                                onUsuarioClick = { userId -> navController.navigate("perfil/$userId") },
+                                onAddUsuario = { navController.navigate("formulario") }
                             )
                         }
                         composable(
-                            "perfil",
+                            "perfil/{userId}",
+                            arguments = listOf(navArgument("userId") { type = NavType.IntType }),
                             enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
                             exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
                             popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                             popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
-                        ) {
+                        ) { backStackEntry ->
+                            val userId = backStackEntry.arguments?.getInt("userId") ?: 0
                             PerfilScreen(
+                                userId = userId,
                                 viewModel = viewModel,
                                 onNavigateBack = { navController.navigateUp() }
                             )

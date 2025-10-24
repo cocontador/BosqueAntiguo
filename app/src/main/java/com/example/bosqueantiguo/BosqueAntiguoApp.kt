@@ -18,7 +18,7 @@ class BosqueAntiguoApp : Application() {
             this,
             AppDatabase::class.java,
             "bosqueantiguo_db"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     // Instancia única del repositorio
