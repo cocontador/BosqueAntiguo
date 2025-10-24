@@ -3,21 +3,23 @@ package com.example.bosqueantiguo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
+import com.example.bosqueantiguo.ui.view.AjustesScreen
 import com.example.bosqueantiguo.ui.view.FormularioScreen
+import com.example.bosqueantiguo.ui.view.MainScreen
+import com.example.bosqueantiguo.ui.view.PerfilScreen
 import com.example.bosqueantiguo.ui.view.ResumenScreen
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
-import com.example.bosqueantiguo.ui.view.AjustesScreen
-import com.example.bosqueantiguo.ui.view.MainScreen
-import com.example.bosqueantiguo.ui.view.PerfilScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     val factory = UsuarioViewModelFactory(repository)
                     val viewModel: UsuarioViewModel = viewModel(factory = factory)
 
-                    // Estructura de navegación
+                    // Estructura de navegación con animaciones
                     NavHost(navController = navController, startDestination = "main") {
                         composable("main") {
                             MainScreen(
@@ -49,23 +51,47 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToAjustes = { navController.navigate("ajustes") }
                             )
                         }
-                        composable("formulario") {
+                        composable(
+                            "formulario",
+                            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+                            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                            popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+                        ) {
                             FormularioScreen(
                                 viewModel = viewModel,
                                 onGuardado = { navController.navigate("resumen") },
                                 onNavigateBack = { navController.navigateUp() }
                             )
                         }
-                        composable("resumen") {
+                        composable(
+                            "resumen",
+                            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+                            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                            popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+                        ) {
                             ResumenScreen(
                                 viewModel = viewModel,
                                 onNavigateBack = { navController.navigateUp() }
                             )
                         }
-                        composable("perfil") {
+                        composable(
+                            "perfil",
+                            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+                            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                            popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+                        ) {
                             PerfilScreen(onNavigateBack = { navController.navigateUp() })
                         }
-                        composable("ajustes") {
+                        composable(
+                            "ajustes",
+                            enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+                            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+                            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+                            popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+                        ) {
                             AjustesScreen(
                                 onNavigateBack = { navController.navigateUp() },
                                 onExitApp = { finish() }
