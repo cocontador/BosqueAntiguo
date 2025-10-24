@@ -3,45 +3,61 @@ package com.example.bosqueantiguo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
+import com.example.bosqueantiguo.model.AppDatabase
+import com.example.bosqueantiguo.repository.UsuarioRepository
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
+import com.example.bosqueantiguo.ui.view.FormularioScreen
+import com.example.bosqueantiguo.ui.view.ResumenScreen
+import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
+import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Instanciamos la base de datos y el repositorio de Room
+        val database = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "bosqueantiguo_db"
+        ).build()
+
+        val repository = UsuarioRepository(database.usuarioDao())
+
         setContent {
             BosqueAntiguoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(color = MaterialTheme.colorScheme.background) {
+
+                    // Controlador de navegación
+                    val navController = rememberNavController()
+
+                    // Factory para inyectar el repositorio al ViewModel
+                    val factory = UsuarioViewModelFactory(repository)
+                    val viewModel: UsuarioViewModel = viewModel(factory = factory)
+
+                    // Estructura de navegación
+                    NavHost(navController = navController, startDestination = "formulario") {
+                        composable("formulario") {
+                            FormularioScreen(
+                                viewModel = viewModel,
+                                onGuardado = {
+                                    navController.navigate("resumen")
+                                }
+                            )
+                        }
+                        composable("resumen") {
+                            ResumenScreen(viewModel = viewModel)
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BosqueAntiguoTheme {
-        Greeting("Android")
     }
 }
