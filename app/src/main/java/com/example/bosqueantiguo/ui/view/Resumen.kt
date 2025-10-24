@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,7 +59,10 @@ fun ResumenScreen(
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(listaUsuarios) { usuario ->
-                        UsuarioCard(usuario = usuario)
+                        UsuarioCard(
+                            usuario = usuario,
+                            onEliminar = { viewModel.eliminarUsuario(usuario) }
+                        )
                     }
                 }
             }
@@ -67,15 +71,23 @@ fun ResumenScreen(
 }
 
 @Composable
-fun UsuarioCard(usuario: Usuario) {
+fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text("👤 ${usuario.nombre}", style = MaterialTheme.typography.titleMedium)
-            Text("📧 ${usuario.correo}", style = MaterialTheme.typography.bodyMedium)
-            Text("🎂 Edad: ${usuario.edad}", style = MaterialTheme.typography.bodyMedium)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("👤 ${usuario.nombre}", style = MaterialTheme.typography.titleMedium)
+                Text("📧 ${usuario.correo}", style = MaterialTheme.typography.bodyMedium)
+                Text("🎂 Edad: ${usuario.edad}", style = MaterialTheme.typography.bodyMedium)
+            }
+            IconButton(onClick = onEliminar) {
+                Icon(Icons.Default.Delete, contentDescription = "Eliminar usuario")
+            }
         }
     }
 }

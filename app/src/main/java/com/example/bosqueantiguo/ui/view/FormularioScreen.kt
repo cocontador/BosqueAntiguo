@@ -1,7 +1,9 @@
 package com.example.bosqueantiguo.ui.view
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -49,7 +51,8 @@ fun FormularioScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()), // Para evitar que el teclado oculte los campos
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -65,6 +68,8 @@ fun FormularioScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             OutlinedTextField(
                 value = state.correo,
                 onValueChange = viewModel::onCorreoChange,
@@ -75,6 +80,8 @@ fun FormularioScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = state.edad,
@@ -88,6 +95,8 @@ fun FormularioScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             OutlinedTextField(
                 value = state.contrasena,
                 onValueChange = viewModel::onContrasenaChange,
@@ -100,7 +109,7 @@ fun FormularioScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(24.dp))
 
             Button(
                 onClick = { viewModel.guardarUsuario() },
