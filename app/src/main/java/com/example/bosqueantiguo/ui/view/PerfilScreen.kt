@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.bosqueantiguo.R
 
@@ -51,6 +53,21 @@ fun PerfilScreen(onNavigateBack: () -> Unit) {
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Nombre y correo del usuario
+            Text(
+                text = "Nombre de Usuario",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "usuario@correo.com",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Gray
             )
 
             Spacer(modifier = Modifier.height(48.dp))
