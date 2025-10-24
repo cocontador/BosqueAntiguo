@@ -23,6 +23,10 @@ class UsuarioViewModel(
     private val _usuarios = MutableStateFlow<List<Usuario>>(emptyList())
     val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
 
+    // Estado de carga
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     init {
         cargarUsuarios()
     }
@@ -105,9 +109,11 @@ class UsuarioViewModel(
 
     /** Carga la lista de usuarios desde Room (Flow) */
     fun cargarUsuarios() {
+        _isLoading.value = true
         viewModelScope.launch {
             repository.obtenerUsuarios().collect { lista ->
                 _usuarios.value = lista
+                _isLoading.value = false
             }
         }
     }

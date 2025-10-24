@@ -1,6 +1,8 @@
 package com.example.bosqueantiguo.ui.view
 
-import androidx.compose.foundation.Image
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -8,29 +10,35 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.bosqueantiguo.R
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen(
-    viewModel: UsuarioViewModel, // 1. Recibe el ViewModel
+    viewModel: UsuarioViewModel,
     onNavigateBack: () -> Unit
 ) {
-    // 2. Obtiene la lista de usuarios y selecciona el último
     val usuarios by viewModel.usuarios.collectAsState()
-    val ultimoUsuario = usuarios.lastOrNull()
+    val isLoading by viewModel.isLoading.collectAsState()
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            imageUri = uri
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -47,56 +55,67 @@ fun PerfilScreen(
             )
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            contentAlignment = Alignment.Center
         ) {
-            // Imagen de perfil circular
-            Image(
-                painter = painterResource(id = R.drawable.logoba),
-                contentDescription = "Imagen de perfil",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-            )
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                val ultimoUsuario = usuarios.lastOrNull()
+                if (ultimoUsuario == null) {
+                    Text("No hay ningún usuario registrado.")
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        AsyncImage(
+                            model = imageUri ?: R.drawable.logoba,
+                            contentDescription = "Imagen de perfil",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(150.dp)
+                                .clip(CircleShape)
+                        )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
-            // 3. Muestra los datos del último usuario
-            Text(
-                text = ultimoUsuario?.nombre ?: "Sin Usuario",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = ultimoUsuario?.correo ?: "sin.correo@dominio.com",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray
-            )
+                        Text(
+                            text = ultimoUsuario.nombre,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = ultimoUsuario.correo,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.Gray
+                        )
 
-            Spacer(modifier = Modifier.height(48.dp))
+                        Spacer(modifier = Modifier.height(48.dp))
 
-            // Botones para Cámara y Galería
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(onClick = { /* TODO: Lógica para la cámara */ }) {
-                    Icon(Icons.Default.PhotoCamera, contentDescription = "Cámara")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Cámara")
-                }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Button(onClick = { /* TODO: Lógica para la cámara */ }) {
+                                Icon(Icons.Default.PhotoCamera, contentDescription = "Cámara")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Cámara")
+                            }
 
-                Button(onClick = { /* TODO: Lógica para la galería */ }) {
-                    Icon(Icons.Default.Image, contentDescription = "Galería")
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Galería")
+                            Button(onClick = { galleryLauncher.launch("image/*") }) {
+                                Icon(Icons.Default.Image, contentDescription = "Galería")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Galería")
+                            }
+                        }
+                    }
                 }
             }
         }
