@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +22,9 @@ import com.example.bosqueantiguo.ui.view.PerfilScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Instala la pantalla de inicio
+        installSplashScreen()
 
         // Obtiene el repositorio desde la clase Application
         val repository = (application as BosqueAntiguoApp).repository
@@ -62,7 +66,10 @@ class MainActivity : ComponentActivity() {
                             PerfilScreen(onNavigateBack = { navController.navigateUp() })
                         }
                         composable("ajustes") {
-                            AjustesScreen(onNavigateBack = { navController.navigateUp() })
+                            AjustesScreen(
+                                onNavigateBack = { navController.navigateUp() },
+                                onExitApp = { finish() }
+                            )
                         }
                     }
                 }
