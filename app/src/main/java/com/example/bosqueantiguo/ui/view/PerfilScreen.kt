@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,10 +20,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.bosqueantiguo.R
+import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(onNavigateBack: () -> Unit) {
+fun PerfilScreen(
+    viewModel: UsuarioViewModel, // 1. Recibe el ViewModel
+    onNavigateBack: () -> Unit
+) {
+    // 2. Obtiene la lista de usuarios y selecciona el último
+    val usuarios by viewModel.usuarios.collectAsState()
+    val ultimoUsuario = usuarios.lastOrNull()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,15 +67,15 @@ fun PerfilScreen(onNavigateBack: () -> Unit) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Nombre y correo del usuario
+            // 3. Muestra los datos del último usuario
             Text(
-                text = "Nombre de Usuario",
+                text = ultimoUsuario?.nombre ?: "Sin Usuario",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "usuario@correo.com",
+                text = ultimoUsuario?.correo ?: "sin.correo@dominio.com",
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Gray
             )

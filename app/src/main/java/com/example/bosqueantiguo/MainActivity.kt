@@ -83,7 +83,10 @@ class MainActivity : ComponentActivity() {
                             popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
                             popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
                         ) {
-                            PerfilScreen(onNavigateBack = { navController.navigateUp() })
+                            PerfilScreen(
+                                viewModel = viewModel,
+                                onNavigateBack = { navController.navigateUp() }
+                            )
                         }
                         composable(
                             "ajustes",
