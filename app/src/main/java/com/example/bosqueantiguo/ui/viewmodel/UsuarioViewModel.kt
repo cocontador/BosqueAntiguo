@@ -76,6 +76,13 @@ class UsuarioViewModel(
         }
     }
 
+    /** Elimina un usuario específico */
+    fun eliminarUsuario(usuario: Usuario) {
+        viewModelScope.launch {
+            repository.eliminarUsuario(usuario)
+        }
+    }
+
     /** Valida los campos antes de guardar */
     private fun validarCampos(estado: UsuarioUIState): UsuarioErrores {
         var nombreErr: String? = null
@@ -83,10 +90,10 @@ class UsuarioViewModel(
         var edadErr: String? = null
         var contrasenaErr: String? = null
 
-        if (estado.nombre.isBlank()) nombreErr = "El nombre no puede estar vacío."
-        if (!estado.correo.contains("@")) correoErr = "Correo inválido."
-        if (estado.edad.toIntOrNull() == null) edadErr = "Edad inválida."
-        if (estado.contrasena.length < 4) contrasenaErr = "Mínimo 4 caracteres."
+        if (estado.nombre.isBlank()) nombreErr = "El nombre no puede estar vacío, por favor ingresa tu nombre"
+        if (!estado.correo.contains("@")) correoErr = "Correo inválido, debe contener @"
+        if (estado.edad.toIntOrNull() == null) edadErr = "Edad inválida, ingrese solo números y no letras."
+        if (estado.contrasena.length < 4) contrasenaErr = "Su clave debe tener mínimo 4 caracteres."
 
         return UsuarioErrores(
             nombreError = nombreErr,

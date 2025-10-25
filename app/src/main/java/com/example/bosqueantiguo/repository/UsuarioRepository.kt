@@ -21,6 +21,13 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
     }
 
     /**
+     * Elimina un usuario de la base de datos.
+     */
+    suspend fun eliminarUsuario(usuario: Usuario) {
+        usuarioDao.eliminarUsuario(usuario)
+    }
+
+    /**
      * Devuelve un flujo (Flow) con la lista de usuarios almacenados.
      * Se actualiza automáticamente cuando cambia la base de datos.
      */
