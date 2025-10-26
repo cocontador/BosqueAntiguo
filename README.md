@@ -37,51 +37,58 @@ Explorar el desarrollo de interfaces móviles estructuradas y funcionales, aplic
 ```plaintext
 app/
 ├─ manifests/
-│ └─ AndroidManifest.xml
+│  └─ AndroidManifest.xml
 │
 ├─ kotlin+java/
-│ └─ com/
-│ └─ example/
-│ └─ bosqueantiguo/
-│ ├─ model/
-│ │ ├─ AppDatabase.kt
-│ │ ├─ Usuario.kt
-│ │ └─ UsuarioDao.kt
-│ │
-│ ├─ repository/
-│ │ └─ UsuarioRepository.kt
-│ │
-│ ├─ ui/
-│ │ ├─ theme/
-│ │ │ ├─ Color.kt
-│ │ │ ├─ Theme.kt
-│ │ │ └─ Type.kt
-│ │ │
-│ │ ├─ view/
-│ │ │ ├─ HomeScreen.kt
-│ │ │ ├─ FormScreen.kt
-│ │ │ ├─ SummaryScreen.kt
-│ │ │ ├─ SettingsScreen.kt
-│ │ │ └─ ProfileScreen.kt
-│ │ │
-│ │ └─ viewmodel/
-│ │ ├─ UsuarioViewModel.kt
-│ │ └─ FormViewModel.kt
-│ │
-│ ├─ BosqueAntiguoApp.kt
-│ └─ MainActivity.kt
+│  └─ com/
+│     └─ example/
+│        └─ bosqueantiguo/
+│           ├─ model/
+│           │  ├─ AppDatabase.kt
+│           │  ├─ Usuario.kt
+│           │  └─ UsuarioDao.kt
+│           │
+│           ├─ repository/
+│           │  └─ UsuarioRepository.kt
+│           │
+│           ├─ ui/
+│           │  ├─ theme/
+│           │  │  ├─ Color.kt
+│           │  │  ├─ Theme.kt
+│           │  │  └─ Type.kt
+│           │  │
+│           │  ├─ view/
+│           │  │  ├─ AjustesScreen.kt
+│           │  │  ├─ FormularioScreen.kt
+│           │  │  ├─ MainScreen.kt
+│           │  │  ├─ PerfilScreen.kt
+│           │  │  ├─ ProductoScreen.kt
+│           │  │  └─ ResumenScreen.kt
+│           │  │
+│           │  └─ viewmodel/
+│           │     ├─ UsuarioErrores.kt
+│           │     ├─ UsuarioUIState.kt
+│           │     ├─ UsuarioViewModel.kt
+│           │     └─ UsuarioViewModelFactory.kt
+│           │
+│           ├─ BosqueAntiguoApp.kt
+│           └─ MainActivity.kt
 │
 ├─ res/
-│ ├─ drawable/
-│ ├─ mipmap/
-│ ├─ values/
-│ └─ xml/
+│  ├─ drawable/
+│  ├─ mipmap/
+│  ├─ values/
+│  └─ xml/
 │
 └─ Gradle Scripts/
-├─ build.gradle.kts (Module: app)
-├─ build.gradle.kts (Project)
-├─ proguard-rules.pro
-└─ gradle.properties
+   ├─ build.gradle.kts (Project: Bosque_Antiguo)
+   ├─ build.gradle.kts (Module: app)
+   ├─ proguard-rules.pro
+   ├─ gradle.properties
+   ├─ gradle-wrapper.properties
+   ├─ libs.versions.toml
+   ├─ local.properties
+   └─ settings.gradle.kts
 ```
 ---
 
