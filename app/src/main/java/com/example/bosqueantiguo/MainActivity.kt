@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     // Estructura de navegación
                     NavHost(navController = navController, startDestination = "main") {
 
-                        // 🔹 Pantalla principal
+                        //  Pantalla principal
                         composable("main") {
                             MainScreen(
                                 onNavigateToRegistro = { navController.navigate("formulario") },
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 🔹 Registro de usuario
+                        // Registro de usuario
                         composable("formulario") {
                             FormularioScreen(
                                 viewModel = viewModel,
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 🔹 Resumen de usuarios
+                        //  Resumen de usuarios
                         composable("resumen") {
                             ResumenScreen(
                                 viewModel = viewModel,
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 🔹 Perfil genérico (desde menú principal)
+                        // Perfil genérico (desde menú principal)
                         composable("perfil") {
                             PerfilScreen(
                                 usuarioId = null,
@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 🔹 Perfil de usuario específico (desde resumen)
+                        // Perfil de usuario específico (desde resumen)
                         composable("perfil/{usuarioId}") { backStackEntry ->
                             val usuarioId = backStackEntry.arguments?.getString("usuarioId")
                             PerfilScreen(
@@ -93,12 +93,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 🔹 Catálogo de productos
+                        //  Catálogo de productos
                         composable("producto") {
                             ProductoScreen(onNavigateBack = { navController.navigateUp() })
                         }
 
-                        // 🔹 Ajustes
+                        //  Ajustes
                         composable("ajustes") {
                             AjustesScreen(
                                 onNavigateBack = { navController.navigateUp() },

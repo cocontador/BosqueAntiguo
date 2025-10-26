@@ -152,7 +152,7 @@ fun FormularioScreen(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
-            // 🖼 Imagen (foto tomada o seleccionada)
+            // Imagen (foto tomada o seleccionada)
             AsyncImage(
                 model = imageUri ?: R.drawable.no_profile_picture,
                 contentDescription = "Foto del usuario",

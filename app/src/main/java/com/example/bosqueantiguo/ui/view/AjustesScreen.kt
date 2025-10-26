@@ -40,7 +40,7 @@ fun AjustesScreen(onNavigateBack: () -> Unit, onExitApp: () -> Unit) {
             verticalArrangement = Arrangement.SpaceBetween
         ) {
 
-            // 🔹 Información del equipo
+            // Información del equipo
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -76,7 +76,7 @@ fun AjustesScreen(onNavigateBack: () -> Unit, onExitApp: () -> Unit) {
                 )
             }
 
-            // 🔹 Botón para salir
+            // Botón para salir
             Button(
                 onClick = onExitApp,
                 colors = ButtonDefaults.buttonColors(
