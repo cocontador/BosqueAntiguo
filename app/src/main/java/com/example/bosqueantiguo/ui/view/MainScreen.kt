@@ -15,7 +15,8 @@ import com.example.bosqueantiguo.R
 fun MainScreen(
     onNavigateToRegistro: () -> Unit,
     onNavigateToPerfil: () -> Unit,
-    onNavigateToAjustes: () -> Unit
+    onNavigateToAjustes: () -> Unit,
+    onNavigateToProducto: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -46,6 +47,11 @@ fun MainScreen(
 
         Button(onClick = onNavigateToAjustes, modifier = Modifier.fillMaxWidth()) {
             Text("Ajustes")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = onNavigateToProducto, modifier = Modifier.fillMaxWidth()) {
+            Text("Catálogo")
         }
     }
 }
