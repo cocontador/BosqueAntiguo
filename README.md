@@ -34,22 +34,53 @@ Explorar el desarrollo de interfaces móviles estructuradas y funcionales, aplic
 
 ---
 ## Estructura del proyecto
-com.example.bosqueantiguo/
-├─ model/ → Clases de datos y componentes de persistencia
-│   ├─ Usuario.kt → Modelo principal
-│   ├─ UsuarioDao.kt → Interfaz DAO para operaciones con Room
-│   └─ AppDatabase.kt → Base de datos local (Room)
+app/
+├─ manifests/
+│  └─ AndroidManifest.xml
 │
-├─ repository/ → Capa de acceso a datos
-│   └─ UsuarioRepository.kt → Gestiona las operaciones entre ViewModel y Room
+├─ kotlin+java/
+│  └─ com/
+│     └─ example/
+│        └─ bosqueantiguo/
+│           ├─ model/
+│           │  ├─ AppDatabase.kt
+│           │  ├─ Usuario.kt
+│           │  └─ UsuarioDao.kt
+│           │
+│           ├─ repository/
+│           │  └─ UsuarioRepository.kt
+│           │
+│           ├─ ui/
+│           │  ├─ theme/
+│           │  │  ├─ Color.kt
+│           │  │  ├─ Theme.kt
+│           │  │  └─ Type.kt
+│           │  │
+│           │  ├─ view/
+│           │  │  ├─ HomeScreen.kt
+│           │  │  ├─ FormScreen.kt
+│           │  │  ├─ SummaryScreen.kt
+│           │  │  ├─ SettingsScreen.kt
+│           │  │  └─ ProfileScreen.kt
+│           │  │
+│           │  └─ viewmodel/
+│           │     ├─ UsuarioViewModel.kt
+│           │     └─ FormViewModel.kt
+│           │
+│           ├─ BosqueAntiguoApp.kt
+│           └─ MainActivity.kt
 │
-├─ ui/
-│   ├─ theme/ → Colores, tipografía y estilos de Compose
-│   ├─ view/ → Pantallas principales (Home, Form, Perfil, Ajustes, etc.)
-│   └─ viewmodel/ → Lógica de presentación y gestión de estado (UsuarioViewModel, etc.)
+├─ res/
+│  ├─ drawable/
+│  ├─ mipmap/
+│  ├─ values/
+│  └─ xml/
 │
-├─ BosqueAntiguoApp.kt → Punto de entrada de la aplicación
-└─ MainActivity.kt → Activity principal que inicializa la navegación
+└─ Gradle Scripts/
+   ├─ build.gradle.kts (Module: app)
+   ├─ build.gradle.kts (Project)
+   ├─ proguard-rules.pro
+   └─ gradle.properties
 
 ---
 
@@ -61,7 +92,7 @@ Proyecto basado en la versión web original **Bosque Antiguo**, desarrollada con
 ## Equipo de desarrollo
 
 - **Paulina Zúñiga** 
-- **César Monguez** 
+- **César Mongez** 
 - **Constanza Contador** 
 
 ---
