@@ -48,7 +48,9 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToRegistro = { navController.navigate("formulario") },
                                 onNavigateToPerfil = { navController.navigate("perfil") },
                                 onNavigateToAjustes = { navController.navigate("ajustes") },
-                                onNavigateToProducto = { navController.navigate("producto") }
+                                onNavigateToProducto = { navController.navigate("producto") },
+                                onNavigateToResumen = { navController.navigate("resumen") }
+
 
                             )
                         }

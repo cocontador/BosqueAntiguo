@@ -3,6 +3,7 @@ package com.example.bosqueantiguo.ui.view
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -13,8 +14,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.bosqueantiguo.R
 import com.example.bosqueantiguo.model.Usuario
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 
@@ -77,14 +81,27 @@ fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 🖼️ Imagen de perfil circular
+            AsyncImage(
+                model = usuario.imagenUri ?: R.drawable.logoba,
+                contentDescription = "Imagen del usuario",
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .padding(end = 12.dp)
+            )
+
             Column(modifier = Modifier.weight(1f)) {
                 Text("👤 ${usuario.nombre}", style = MaterialTheme.typography.titleMedium)
                 Text("📧 ${usuario.correo}", style = MaterialTheme.typography.bodyMedium)
                 Text("🎂 Edad: ${usuario.edad}", style = MaterialTheme.typography.bodyMedium)
             }
+
             IconButton(onClick = onEliminar) {
                 Icon(Icons.Default.Delete, contentDescription = "Eliminar usuario")
             }
