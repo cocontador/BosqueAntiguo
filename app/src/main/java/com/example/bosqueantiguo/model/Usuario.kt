@@ -15,5 +15,7 @@ data class Usuario(
     val nombre: String,
     val correo: String,
     val edad: Int,
-    val contrasena: String
+    val contrasena: String,
+    val imagenUri: String? = null
+
 )

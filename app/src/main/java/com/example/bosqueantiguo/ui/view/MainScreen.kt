@@ -16,7 +16,8 @@ fun MainScreen(
     onNavigateToRegistro: () -> Unit,
     onNavigateToPerfil: () -> Unit,
     onNavigateToAjustes: () -> Unit,
-    onNavigateToProducto: () -> Unit
+    onNavigateToProducto: () -> Unit,
+    onNavigateToResumen: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -47,6 +48,11 @@ fun MainScreen(
 
         Button(onClick = onNavigateToAjustes, modifier = Modifier.fillMaxWidth()) {
             Text("Ajustes")
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = onNavigateToResumen, modifier = Modifier.fillMaxWidth()) {
+            Text("Usuarios")
         }
         Spacer(modifier = Modifier.height(8.dp))
 

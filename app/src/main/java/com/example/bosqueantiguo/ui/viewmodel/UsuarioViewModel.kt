@@ -23,6 +23,14 @@ class UsuarioViewModel(
     private val _usuarios = MutableStateFlow<List<Usuario>>(emptyList())
     val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
 
+    private val _imagenUri = MutableStateFlow<String?>(null)
+    val imagenUri: StateFlow<String?> = _imagenUri.asStateFlow()
+
+    fun setImagenUri(uri: String?) {
+        _imagenUri.value = uri
+    }
+
+
     init {
         cargarUsuarios()
     }
@@ -60,7 +68,9 @@ class UsuarioViewModel(
                 nombre = estado.nombre.trim(),
                 correo = estado.correo.trim(),
                 edad = estado.edad.toIntOrNull() ?: 0,
-                contrasena = estado.contrasena.trim()
+                contrasena = estado.contrasena.trim(),
+                imagenUri = _imagenUri.value
+
             )
             repository.insertarUsuario(usuario)
             _uiState.update {
