@@ -34,6 +34,7 @@ Explorar el desarrollo de interfaces móviles estructuradas y funcionales, aplic
 
 ---
 ## Estructura del proyecto
+plaintext
 app/
 ├─ manifests/
 │  └─ AndroidManifest.xml
@@ -82,6 +83,7 @@ app/
    ├─ proguard-rules.pro
    └─ gradle.properties
 
+plaintext
 ---
 
 ## Inspiración
