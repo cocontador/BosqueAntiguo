@@ -36,14 +36,14 @@ fun PerfilScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // 🔹 Cargar datos del usuario seleccionado
+    //  Cargar datos del usuario seleccionado
     LaunchedEffect(usuarioId) {
         usuarioId?.let { viewModel.cargarUsuarioPorId(it.toInt()) }
     }
 
     val usuario = viewModel.usuarioSeleccionado.collectAsState().value
 
-    // 🚀 Inicializa la imagen con la del usuario (si existe)
+    //  Inicializa la imagen con la del usuario (si existe)
     LaunchedEffect(usuario?.imagenUri) {
         usuario?.imagenUri?.let {
             imageUri = Uri.parse(it)
