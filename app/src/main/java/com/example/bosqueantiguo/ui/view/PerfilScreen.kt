@@ -14,33 +14,96 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.example.bosqueantiguo.R
+import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.ui.unit.dp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(onNavigateBack: () -> Unit) {
+fun PerfilScreen(
+    usuarioId: String?,
+    onNavigateBack: () -> Unit,
+    viewModel: UsuarioViewModel
+) {
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    var imageUri by remember { mutableStateOf<Uri?>(null) } // imagen mostrada
-    var cameraUri by remember { mutableStateOf<Uri?>(null) } // destino de la foto
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Abrir galería (no requiere permisos en Android 13+)
+    // 🔹 Cargar datos del usuario seleccionado
+    LaunchedEffect(usuarioId) {
+        usuarioId?.let { viewModel.cargarUsuarioPorId(it.toInt()) }
+    }
+
+    val usuario = viewModel.usuarioSeleccionado.collectAsState().value
+
+    // 🚀 Inicializa la imagen con la del usuario (si existe)
+    LaunchedEffect(usuario?.imagenUri) {
+        usuario?.imagenUri?.let {
+            imageUri = Uri.parse(it)
+        }
+    }
+
+    // --------- FUNCIONES AUXILIARES -----------
+
+    // Copiar imagen de la galería a carpeta interna
+    fun copyImageToAppStorage(context: Context, sourceUri: Uri): Uri? {
+        return try {
+            val time = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = File(dir, "IMG_${time}.jpg")
+
+            context.contentResolver.openInputStream(sourceUri)?.use { input ->
+                file.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // Crea archivo temporal para fotos tomadas
+    fun createImageUri(context: Context): Uri {
+        val time = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val file = File.createTempFile("JPEG_${time}_", ".jpg", dir)
+        return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+    }
+
+    // --------- SELECTOR DE IMAGEN -----------
+
     val pickImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri -> if (uri != null) imageUri = uri }
+    ) { uri ->
+        if (uri != null) {
+            // Copiamos la imagen a la carpeta de la app
+            val localUri = copyImageToAppStorage(context, uri)
+            imageUri = localUri
+            if (localUri != null && usuario != null) {
+                viewModel.actualizarImagenUsuario(usuario.id, localUri.toString())
+            }
+        }
+    }
 
-    // Tomar foto y guardar en cameraUri
     val takePicture = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
-    ) { ok -> if (ok) imageUri = cameraUri }
+    ) { ok ->
+        if (ok && usuario != null) {
+            imageUri = cameraUri
+            viewModel.actualizarImagenUsuario(usuario.id, cameraUri.toString())
+        }
+    }
 
-    // Pedir permiso de cámara si hace falta
     val requestCameraPermission = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
@@ -63,10 +126,12 @@ fun PerfilScreen(onNavigateBack: () -> Unit) {
         }
     }
 
+    // --------- UI -----------
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Perfil") },
+                title = { Text("Perfil de ${usuario?.nombre ?: "Usuario"}") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -83,9 +148,11 @@ fun PerfilScreen(onNavigateBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Imagen (foto tomada o seleccionada) con placeholder
+
+            Text("Foto de perfil", style = MaterialTheme.typography.titleMedium)
+
             AsyncImage(
-                model = imageUri ?: R.drawable.logoba,
+                model = imageUri ?: R.drawable.no_profile_picture,
                 contentDescription = "Imagen de perfil",
                 modifier = Modifier.size(180.dp)
             )
@@ -99,14 +166,17 @@ fun PerfilScreen(onNavigateBack: () -> Unit) {
                 onClick = { openCamera() },
                 modifier = Modifier.fillMaxWidth()
             ) { Text("Tomar foto con cámara") }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 8.dp),
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outline
+            )
+
+            usuario?.let {
+                Text("📧 ${it.correo}", style = MaterialTheme.typography.bodyLarge)
+                Text("🎂 Edad: ${it.edad}", style = MaterialTheme.typography.bodyLarge)
+            }
         }
     }
-}
-
-/** Crea archivo temporal y devuelve su Uri con FileProvider */
-private fun createImageUri(context: Context): Uri {
-    val time = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-    val file = File.createTempFile("JPEG_${time}_", ".jpg", dir)
-    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 }

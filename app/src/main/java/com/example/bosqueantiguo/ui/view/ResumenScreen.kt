@@ -1,5 +1,6 @@
 package com.example.bosqueantiguo.ui.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,15 +9,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.bosqueantiguo.R
 import com.example.bosqueantiguo.model.Usuario
@@ -25,7 +23,8 @@ import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResumenScreen(
-    viewModel: UsuarioViewModel = viewModel(),
+    viewModel: UsuarioViewModel,
+    navController: NavController,
     onNavigateBack: () -> Unit
 ) {
     val listaUsuarios by viewModel.usuarios.collectAsState()
@@ -65,7 +64,10 @@ fun ResumenScreen(
                     items(listaUsuarios) { usuario ->
                         UsuarioCard(
                             usuario = usuario,
-                            onEliminar = { viewModel.eliminarUsuario(usuario) }
+                            onEliminar = { viewModel.eliminarUsuario(usuario) },
+                            onVerPerfil = { seleccionado ->
+                                navController.navigate("perfil/${seleccionado.id}")
+                            }
                         )
                     }
                 }
@@ -75,20 +77,19 @@ fun ResumenScreen(
 }
 
 @Composable
-fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit) {
+fun UsuarioCard(usuario: Usuario, onEliminar: () -> Unit, onVerPerfil: (Usuario) -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onVerPerfil(usuario) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 🖼️ Imagen de perfil circular
             AsyncImage(
-                model = usuario.imagenUri ?: R.drawable.logoba,
+                model = usuario.imagenUri ?: R.drawable.no_profile_picture,
                 contentDescription = "Imagen del usuario",
                 modifier = Modifier
                     .size(64.dp)

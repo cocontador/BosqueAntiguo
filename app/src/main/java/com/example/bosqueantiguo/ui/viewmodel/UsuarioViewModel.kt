@@ -26,6 +26,24 @@ class UsuarioViewModel(
     private val _imagenUri = MutableStateFlow<String?>(null)
     val imagenUri: StateFlow<String?> = _imagenUri.asStateFlow()
 
+
+    private val _usuarioSeleccionado = MutableStateFlow<Usuario?>(null)
+    val usuarioSeleccionado: StateFlow<Usuario?> = _usuarioSeleccionado
+
+    fun cargarUsuarioPorId(id: Int) {
+        viewModelScope.launch {
+            val usuario = repository.obtenerUsuarioPorId(id)
+            _usuarioSeleccionado.value = usuario
+        }
+    }
+
+    fun actualizarImagenUsuario(id: Int, nuevaUri: String) {
+        viewModelScope.launch {
+            repository.actualizarImagenUsuario(id, nuevaUri)
+            cargarUsuarioPorId(id) // refresca
+        }
+    }
+
     fun setImagenUri(uri: String?) {
         _imagenUri.value = uri
     }
@@ -38,6 +56,9 @@ class UsuarioViewModel(
     /** Actualiza los campos del formulario */
     fun onNombreChange(nuevo: String) {
         _uiState.update { it.copy(nombre = nuevo) }
+    }
+    fun resetGuardado() {
+        _uiState.update { it.copy(guardadoExitoso = false) }
     }
 
     fun onCorreoChange(nuevo: String) {
