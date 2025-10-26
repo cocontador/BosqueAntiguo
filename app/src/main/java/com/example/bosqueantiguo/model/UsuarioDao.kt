@@ -7,10 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Data Access Object (DAO)
- * Define las operaciones CRUD sobre la tabla "usuarios".
- */
 @Dao
 interface UsuarioDao {
 
@@ -26,6 +22,9 @@ interface UsuarioDao {
     @Query("DELETE FROM usuarios")
     suspend fun eliminarTodos()
 
-    @Query("SELECT * FROM usuarios WHERE id = :id")
-    suspend fun obtenerPorId(id: Int): Usuario?
+    @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
+    suspend fun obtenerUsuarioPorId(id: Int): Usuario?
+
+    @Query("UPDATE usuarios SET imagenUri = :uri WHERE id = :id")
+    suspend fun actualizarImagenUsuario(id: Int, uri: String)
 }

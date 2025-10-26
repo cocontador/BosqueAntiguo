@@ -33,7 +33,7 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormularioScreen(
-    viewModel: UsuarioViewModel = viewModel(),
+    viewModel: UsuarioViewModel ,
     onGuardado: () -> Unit = {},
     onNavigateBack: () -> Unit
 ) {
@@ -116,8 +116,11 @@ fun FormularioScreen(
     }
 
     // Redirigir cuando el guardado sea exitoso
-    LaunchedEffect(state.guardadoExitoso) {
-        if (state.guardadoExitoso) onGuardado()
+    LaunchedEffect(key1 = state.guardadoExitoso) {
+        if (state.guardadoExitoso) {
+            viewModel.resetGuardado()
+            onGuardado()
+        }
     }
 
     Scaffold(
@@ -144,10 +147,14 @@ fun FormularioScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            Text(
+                text = "Foto de perfil",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
             // 🖼 Imagen (foto tomada o seleccionada)
             AsyncImage(
-                model = imageUri ?: R.drawable.logoba,
+                model = imageUri ?: R.drawable.no_profile_picture,
                 contentDescription = "Foto del usuario",
                 modifier = Modifier
                     .size(180.dp)

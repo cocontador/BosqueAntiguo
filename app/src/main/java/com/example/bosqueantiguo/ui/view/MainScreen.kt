@@ -4,12 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bosqueantiguo.R
+import androidx.compose.animation.core.*
 
 @Composable
 fun MainScreen(
@@ -19,6 +21,17 @@ fun MainScreen(
     onNavigateToProducto: () -> Unit,
     onNavigateToResumen: () -> Unit
 ) {
+    val scale = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        scale.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 900,
+                easing = FastOutSlowInEasing
+            )
+        )
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,7 +42,7 @@ fun MainScreen(
         Image(
             painter = painterResource(id = R.drawable.logoba),
             contentDescription = "Logo de la aplicación",
-            modifier = Modifier.size(150.dp)
+            modifier = Modifier.size(150.dp).scale(scale.value)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -38,17 +51,7 @@ fun MainScreen(
             Text("Registro")
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = onNavigateToPerfil, modifier = Modifier.fillMaxWidth()) {
-            Text("Perfil")
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(onClick = onNavigateToAjustes, modifier = Modifier.fillMaxWidth()) {
-            Text("Ajustes")
-        }
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(onClick = onNavigateToResumen, modifier = Modifier.fillMaxWidth()) {
@@ -58,6 +61,12 @@ fun MainScreen(
 
         Button(onClick = onNavigateToProducto, modifier = Modifier.fillMaxWidth()) {
             Text("Catálogo")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = onNavigateToAjustes, modifier = Modifier.fillMaxWidth()) {
+            Text("Ajustes")
         }
     }
 }
