@@ -18,6 +18,7 @@ import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
 import com.example.bosqueantiguo.ui.view.AjustesScreen
 import com.example.bosqueantiguo.ui.view.MainScreen
 import com.example.bosqueantiguo.ui.view.PerfilScreen
+import com.example.bosqueantiguo.ui.view.ProductoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,9 @@ class MainActivity : ComponentActivity() {
                             MainScreen(
                                 onNavigateToRegistro = { navController.navigate("formulario") },
                                 onNavigateToPerfil = { navController.navigate("perfil") },
-                                onNavigateToAjustes = { navController.navigate("ajustes") }
+                                onNavigateToAjustes = { navController.navigate("ajustes") },
+                                onNavigateToProducto = { navController.navigate("producto") }
+
                             )
                         }
                         composable("formulario") {
@@ -65,10 +68,15 @@ class MainActivity : ComponentActivity() {
                         composable("perfil") {
                             PerfilScreen(onNavigateBack = { navController.navigateUp() })
                         }
+                        composable("producto") {
+                            ProductoScreen(onNavigateBack = { navController.navigateUp() }
+                            )
+                        }
                         composable("ajustes") {
                             AjustesScreen(
                                 onNavigateBack = { navController.navigateUp() },
                                 onExitApp = { finish() }
+
                             )
                         }
                     }
