@@ -46,7 +46,8 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToPerfil = { navController.navigate("perfil") }, // Perfil genérico
                                 onNavigateToAjustes = { navController.navigate("ajustes") },
                                 onNavigateToProducto = { navController.navigate("producto") },
-                                onNavigateToResumen = { navController.navigate("resumen") }
+                                onNavigateToResumen = { navController.navigate("resumen") },
+                                onNavigateToClima = { navController.navigate("clima") } // Navegación a Clima
                             )
                         }
 
@@ -96,6 +97,11 @@ class MainActivity : ComponentActivity() {
                         //  Catálogo de productos
                         composable("producto") {
                             ProductoScreen(onNavigateBack = { navController.navigateUp() })
+                        }
+
+                        // Nueva pantalla de Clima
+                        composable("clima") {
+                            ClimaScreen()
                         }
 
                         //  Ajustes
