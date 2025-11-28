@@ -4,10 +4,11 @@ import android.app.Application
 import androidx.room.Room
 import com.example.bosqueantiguo.model.AppDatabase
 import com.example.bosqueantiguo.repository.UsuarioRepository
+import com.example.bosqueantiguo.repository.ProductoRepository
 
 /**
  * Clase Application para centralizar la creación de instancias (Singleton).
- * Aquí se inicializa la base de datos y el repositorio para que estén
+ * Aquí se inicializa la base de datos y los repositorios para que estén
  * disponibles durante todo el ciclo de vida de la aplicación.
  */
 class BosqueAntiguoApp : Application() {
@@ -21,8 +22,13 @@ class BosqueAntiguoApp : Application() {
         ).fallbackToDestructiveMigration().build()
     }
 
-    // Instancia única del repositorio
-    val repository by lazy {
+    // Repositorio para usuarios (Room local)
+    val usuarioRepository by lazy {
         UsuarioRepository(database.usuarioDao())
+    }
+    
+    // Repositorio para productos (API remota)
+    val productoRepository by lazy {
+        ProductoRepository()
     }
 }

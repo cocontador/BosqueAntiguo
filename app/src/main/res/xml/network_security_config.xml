@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Configuración para desarrollo - permite HTTP en debug -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Emulador Android -->
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <!-- Localhost -->
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <!-- IP local (cambiar por tu IP de red local) -->
+        <domain includeSubdomains="false">192.168.1.100</domain>
+        <domain includeSubdomains="false">192.168.1.1</domain>
+        <domain includeSubdomains="false">192.168.0.1</domain>
+        <!-- Para pruebas externas -->
+        <domain includeSubdomains="false">google.com</domain>
+    </domain-config>
+    
+    <!-- Configuración global para debug builds -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
