@@ -36,18 +36,31 @@ class MainActivity : ComponentActivity() {
                     val factory = UsuarioViewModelFactory(usuarioRepository)
                     val usuarioViewModel: UsuarioViewModel = viewModel(factory = factory)
 
-                    // Estructura de navegación
-                    NavHost(navController = navController, startDestination = "main") {
+                    // Estructura de navegación con Login como pantalla de inicio
+                    NavHost(navController = navController, startDestination = "login") {
 
-                        //  Pantalla principal
+                        // Pantalla de Login
+                        composable("login") {
+                            LoginScreen(
+                                onLoginSuccess = {
+                                    // Al hacer login, navega a la pantalla principal y limpia la pila
+                                    navController.navigate("main") {
+                                        popUpTo("login") { inclusive = true } // Elimina el login del backstack
+                                        launchSingleTop = true
+                                    }
+                                }
+                            )
+                        }
+
+                        // Pantalla principal
                         composable("main") {
                             MainScreen(
                                 onNavigateToRegistro = { navController.navigate("formulario") },
-                                onNavigateToPerfil = { navController.navigate("perfil") }, // Perfil genérico
+                                onNavigateToPerfil = { navController.navigate("perfil") },
                                 onNavigateToAjustes = { navController.navigate("ajustes") },
                                 onNavigateToProducto = { navController.navigate("producto") },
                                 onNavigateToResumen = { navController.navigate("resumen") },
-                                onNavigateToClima = { navController.navigate("clima") } // Navegación a Clima
+                                onNavigateToClima = { navController.navigate("clima") }
                             )
                         }
 
@@ -56,7 +69,6 @@ class MainActivity : ComponentActivity() {
                             FormularioScreen(
                                 viewModel = usuarioViewModel,
                                 onGuardado = {
-                                    // Navega al resumen y limpia la pila para evitar volver al formulario
                                     navController.navigate("resumen") {
                                         popUpTo("main") { inclusive = false }
                                         launchSingleTop = true
@@ -66,7 +78,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        //  Resumen de usuarios
+                        // Resumen de usuarios
                         composable("resumen") {
                             ResumenScreen(
                                 viewModel = usuarioViewModel,
@@ -75,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Perfil genérico (desde menú principal)
+                        // Perfil genérico
                         composable("perfil") {
                             PerfilScreen(
                                 usuarioId = null,
@@ -84,7 +96,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Perfil de usuario específico (desde resumen)
+                        // Perfil de usuario específico
                         composable("perfil/{usuarioId}") { backStackEntry ->
                             val usuarioId = backStackEntry.arguments?.getString("usuarioId")
                             PerfilScreen(
@@ -94,17 +106,17 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        //  Catálogo de productos
+                        // Catálogo de productos
                         composable("producto") {
                             ProductoScreen(onNavigateBack = { navController.navigateUp() })
                         }
 
-                        // Nueva pantalla de Clima
+                        // Pantalla de Clima
                         composable("clima") {
                             ClimaScreen()
                         }
 
-                        //  Ajustes
+                        // Ajustes
                         composable("ajustes") {
                             AjustesScreen(
                                 onNavigateBack = { navController.navigateUp() },

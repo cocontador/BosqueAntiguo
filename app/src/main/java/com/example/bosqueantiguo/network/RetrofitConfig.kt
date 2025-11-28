@@ -15,23 +15,23 @@ object RetrofitConfig {
     
     private const val TAG = "RetrofitConfig"
     
-    // URLs posibles para el microservicio de productos
-    private const val BASE_URL_EMULATOR = "http://10.0.2.2:8080/"  // Para emulador
-    private const val BASE_URL_DEVICE = "http://192.168.1.100:8080/"  // Para dispositivo físico (cambiar por tu IP local)
-    private const val BASE_URL_LOCALHOST = "http://localhost:8080/"  // Para pruebas
+    // URLs posibles para el microservicio de productos y autenticación
+    private const val BASE_URL_EMULATOR = "http://192.168.1.4:8082/"  // Para emulador
+    private const val BASE_URL_DEVICE = "http://192.168.1.4:8082/"  // Para dispositivo físico (cambiar por tu IP local)
+    private const val BASE_URL_LOCALHOST = "http://localhost:8082/"  // Para pruebas
     
-    // URL base actual para productos (usa emulador por defecto)
-    private const val BASE_URL_PRODUCTOS = BASE_URL_EMULATOR
+    // URL base actual para el backend (usa emulador por defecto)
+    private const val BASE_URL_BACKEND = BASE_URL_EMULATOR
 
     // URL base para el servicio de clima (ej: OpenWeatherMap)
     private const val BASE_URL_CLIMA = "https://api.openweathermap.org/data/2.5/"
     
     init {
         Log.d(TAG, "🔧 Inicializando RetrofitConfig")
-        Log.d(TAG, "🌐 URL Base Productos: $BASE_URL_PRODUCTOS")
+        Log.d(TAG, "🌐 URL Base Backend: $BASE_URL_BACKEND")
         Log.d(TAG, "🌦️ URL Base Clima: $BASE_URL_CLIMA")
         Log.i(TAG, "🔓 Network Security Config habilitado para HTTP")
-        Log.w(TAG, "⚠️ Si no funciona, verifica que el microservicio de productos esté en puerto 8080")
+        Log.w(TAG, "⚠️ Si no funciona, verifica que el microservicio del backend esté en puerto 8082")
     }
     
     // Cliente HTTP con configuración de logging para debug
@@ -61,9 +61,9 @@ object RetrofitConfig {
         }
         .build()
     
-    // Instancia de Retrofit para Productos
-    private val retrofitProductos = Retrofit.Builder()
-        .baseUrl(BASE_URL_PRODUCTOS)
+    // Instancia de Retrofit para el Backend (Productos, Auth, etc.)
+    private val retrofitBackend = Retrofit.Builder()
+        .baseUrl(BASE_URL_BACKEND)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -78,7 +78,7 @@ object RetrofitConfig {
     // Service para productos
     val productoApiService: ProductoApiService by lazy {
         Log.d(TAG, "🏭 Creando ProductoApiService...")
-        val service = retrofitProductos.create(ProductoApiService::class.java)
+        val service = retrofitBackend.create(ProductoApiService::class.java)
         Log.d(TAG, "✅ ProductoApiService creado exitosamente")
         service
     }
@@ -88,6 +88,14 @@ object RetrofitConfig {
         Log.d(TAG, "🏭 Creando ClimaApiService...")
         val service = retrofitClima.create(ClimaApiService::class.java)
         Log.d(TAG, "✅ ClimaApiService creado exitosamente")
+        service
+    }
+
+    // Service para autenticación
+    val authApiService: AuthApiService by lazy {
+        Log.d(TAG, "🏭 Creando AuthApiService...")
+        val service = retrofitBackend.create(AuthApiService::class.java)
+        Log.d(TAG, "✅ AuthApiService creado exitosamente")
         service
     }
 }
