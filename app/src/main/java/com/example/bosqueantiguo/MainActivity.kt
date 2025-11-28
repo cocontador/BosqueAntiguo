@@ -22,8 +22,8 @@ class MainActivity : ComponentActivity() {
         // Instala la pantalla de inicio (SplashScreen)
         installSplashScreen()
 
-        // Obtiene el repositorio desde la clase Application
-        val repository = (application as BosqueAntiguoApp).repository
+        // Obtiene los repositorios desde la clase Application
+        val usuarioRepository = (application as BosqueAntiguoApp).usuarioRepository
 
         setContent {
             BosqueAntiguoTheme {
@@ -32,9 +32,9 @@ class MainActivity : ComponentActivity() {
                     // Controlador de navegación
                     val navController = rememberNavController()
 
-                    // Factory para inyectar el repositorio al ViewModel
-                    val factory = UsuarioViewModelFactory(repository)
-                    val viewModel: UsuarioViewModel = viewModel(factory = factory)
+                    // Factory para inyectar el repositorio al ViewModel de Usuario
+                    val factory = UsuarioViewModelFactory(usuarioRepository)
+                    val usuarioViewModel: UsuarioViewModel = viewModel(factory = factory)
 
                     // Estructura de navegación
                     NavHost(navController = navController, startDestination = "main") {
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                         // 🔹 Registro de usuario
                         composable("formulario") {
                             FormularioScreen(
-                                viewModel = viewModel,
+                                viewModel = usuarioViewModel,
                                 onGuardado = {
                                     // Navega al resumen y limpia la pila para evitar volver al formulario
                                     navController.navigate("resumen") {
@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                         // 🔹 Resumen de usuarios
                         composable("resumen") {
                             ResumenScreen(
-                                viewModel = viewModel,
+                                viewModel = usuarioViewModel,
                                 navController = navController,
                                 onNavigateBack = { navController.navigateUp() }
                             )
@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         composable("perfil") {
                             PerfilScreen(
                                 usuarioId = null,
-                                viewModel = viewModel,
+                                viewModel = usuarioViewModel,
                                 onNavigateBack = { navController.navigateUp() }
                             )
                         }
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             val usuarioId = backStackEntry.arguments?.getString("usuarioId")
                             PerfilScreen(
                                 usuarioId = usuarioId,
-                                viewModel = viewModel,
+                                viewModel = usuarioViewModel,
                                 onNavigateBack = { navController.navigateUp() }
                             )
                         }

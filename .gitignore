@@ -13,3 +13,27 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# APK files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+# Keystore files (IMPORTANT: Never commit these!)
+keystore/
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Test results
+/test-results/
+/androidTest-results/
+
+# Lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
