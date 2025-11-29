@@ -20,17 +20,18 @@ object RetrofitConfig {
     private const val BASE_URL_DEVICE = "http://192.168.1.100:8080/"  // Para dispositivo físico (cambiar por tu IP local)
     private const val BASE_URL_LOCALHOST = "http://localhost:8080/"  // Para pruebas
     
-    // URL base actual (usa emulador por defecto)
-    private const val BASE_URL = BASE_URL_EMULATOR
+    // URL base actual para productos (usa emulador por defecto)
+    private const val BASE_URL_PRODUCTOS = BASE_URL_EMULATOR
+
+    // URL base para el servicio de clima (ej: OpenWeatherMap)
+    private const val BASE_URL_CLIMA = "https://api.openweathermap.org/data/2.5/"
     
     init {
         Log.d(TAG, "🔧 Inicializando RetrofitConfig")
-        Log.d(TAG, "🌐 URL Base configurada: $BASE_URL")
-        Log.d(TAG, "📱 Emulador: $BASE_URL_EMULATOR")
-        Log.d(TAG, "📲 Dispositivo físico: $BASE_URL_DEVICE")
-        Log.d(TAG, "💻 Localhost: $BASE_URL_LOCALHOST")
+        Log.d(TAG, "🌐 URL Base Productos: $BASE_URL_PRODUCTOS")
+        Log.d(TAG, "🌦️ URL Base Clima: $BASE_URL_CLIMA")
         Log.i(TAG, "🔓 Network Security Config habilitado para HTTP")
-        Log.w(TAG, "⚠️ Si no funciona, verifica que el microservicio esté en puerto 8080")
+        Log.w(TAG, "⚠️ Si no funciona, verifica que el microservicio de productos esté en puerto 8080")
     }
     
     // Cliente HTTP con configuración de logging para debug
@@ -60,9 +61,16 @@ object RetrofitConfig {
         }
         .build()
     
-    // Instancia de Retrofit configurada
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+    // Instancia de Retrofit para Productos
+    private val retrofitProductos = Retrofit.Builder()
+        .baseUrl(BASE_URL_PRODUCTOS)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    // Instancia de Retrofit para Clima
+    private val retrofitClima = Retrofit.Builder()
+        .baseUrl(BASE_URL_CLIMA)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
@@ -70,8 +78,16 @@ object RetrofitConfig {
     // Service para productos
     val productoApiService: ProductoApiService by lazy {
         Log.d(TAG, "🏭 Creando ProductoApiService...")
-        val service = retrofit.create(ProductoApiService::class.java)
+        val service = retrofitProductos.create(ProductoApiService::class.java)
         Log.d(TAG, "✅ ProductoApiService creado exitosamente")
+        service
+    }
+
+    // Service para clima
+    val climaApiService: ClimaApiService by lazy {
+        Log.d(TAG, "🏭 Creando ClimaApiService...")
+        val service = retrofitClima.create(ClimaApiService::class.java)
+        Log.d(TAG, "✅ ClimaApiService creado exitosamente")
         service
     }
 }

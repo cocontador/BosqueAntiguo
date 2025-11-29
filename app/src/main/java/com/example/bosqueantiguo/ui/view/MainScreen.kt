@@ -19,7 +19,8 @@ fun MainScreen(
     onNavigateToPerfil: () -> Unit,
     onNavigateToAjustes: () -> Unit,
     onNavigateToProducto: () -> Unit,
-    onNavigateToResumen: () -> Unit
+    onNavigateToResumen: () -> Unit,
+    onNavigateToClima: () -> Unit // Nuevo parámetro
 ) {
     val scale = remember { Animatable(0f) }
 
@@ -61,6 +62,13 @@ fun MainScreen(
 
         Button(onClick = onNavigateToProducto, modifier = Modifier.fillMaxWidth()) {
             Text("Catálogo")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Nuevo botón para Clima
+        Button(onClick = onNavigateToClima, modifier = Modifier.fillMaxWidth()) {
+            Text("Clima")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
