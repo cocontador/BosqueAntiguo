@@ -7,6 +7,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,11 @@ import com.example.bosqueantiguo.ui.viewmodel.AuthViewModel
 import com.example.bosqueantiguo.ui.viewmodel.LoginUiState
 
 @Composable
-fun LoginScreen(authViewModel: AuthViewModel = viewModel(), onLoginSuccess: () -> Unit) {
+fun LoginScreen(
+    authViewModel: AuthViewModel = viewModel(),
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegistro: () -> Unit
+) {
 
     val loginState by authViewModel.loginState.collectAsState()
     val context = LocalContext.current
@@ -58,31 +63,37 @@ fun LoginScreen(authViewModel: AuthViewModel = viewModel(), onLoginSuccess: () -
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        when (val state = loginState) {
-            is LoginUiState.Idle -> {
-                Button(
-                    onClick = { authViewModel.doLogin(email, password) },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = email.isNotBlank() && password.isNotBlank()
-                ) {
-                    Text("Login")
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            when (val state = loginState) {
+                is LoginUiState.Idle -> {
+                    Button(
+                        onClick = { authViewModel.doLogin(email, password) },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = email.isNotBlank() && password.isNotBlank()
+                    ) {
+                        Text("Login")
+                    }
+                }
+                is LoginUiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is LoginUiState.Success -> {
+                    LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                        onLoginSuccess()
+                    }
+                }
+                is LoginUiState.Error -> {
+                    Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                    authViewModel.resetLoginState()
                 }
             }
-            is LoginUiState.Loading -> {
-                CircularProgressIndicator()
-            }
-            is LoginUiState.Success -> {
-                // Navega a la pantalla principal cuando el login es exitoso.
-                // LaunchedEffect se usa para llamar a la navegación de forma segura en Compose.
-                LaunchedEffect(Unit) {
-                    onLoginSuccess()
-                }
-            }
-            is LoginUiState.Error -> {
-                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
-                // Volvemos al estado Idle para que el usuario pueda reintentar
-                authViewModel.resetLoginState()
-            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = onNavigateToRegistro) {
+            Text("¿No tienes una cuenta? Regístrate")
         }
     }
 }
