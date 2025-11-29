@@ -12,6 +12,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.*
+import com.example.bosqueantiguo.ui.viewmodel.CarritoViewModel
+import com.example.bosqueantiguo.ui.viewmodel.ProductoViewModel
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
 
@@ -19,40 +21,34 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Instala la pantalla de inicio (SplashScreen)
         installSplashScreen()
 
-        // Obtiene los repositorios desde la clase Application
         val usuarioRepository = (application as BosqueAntiguoApp).usuarioRepository
 
         setContent {
             BosqueAntiguoTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
 
-                    // Controlador de navegación
                     val navController = rememberNavController()
-
-                    // Factory para inyectar el repositorio al ViewModel de Usuario
                     val factory = UsuarioViewModelFactory(usuarioRepository)
                     val usuarioViewModel: UsuarioViewModel = viewModel(factory = factory)
+                    val carritoViewModel: CarritoViewModel = viewModel()
+                    val productoViewModel: ProductoViewModel = viewModel()
 
-                    // Estructura de navegación con Login como pantalla de inicio
-                    NavHost(navController = navController, startDestination = "login") {
+                    NavHost(navController = navController, startDestination = "main") {
 
-                        // Pantalla de Login
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
-                                    // Al hacer login, navega a la pantalla principal y limpia la pila
                                     navController.navigate("main") {
-                                        popUpTo("login") { inclusive = true } // Elimina el login del backstack
+                                        popUpTo("login") { inclusive = true }
                                         launchSingleTop = true
                                     }
-                                }
+                                },
+                                onNavigateToRegistro = { navController.navigate("formulario") }
                             )
                         }
 
-                        // Pantalla principal
                         composable("main") {
                             MainScreen(
                                 onNavigateToRegistro = { navController.navigate("formulario") },
@@ -60,11 +56,11 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToAjustes = { navController.navigate("ajustes") },
                                 onNavigateToProducto = { navController.navigate("producto") },
                                 onNavigateToResumen = { navController.navigate("resumen") },
-                                onNavigateToClima = { navController.navigate("clima") }
+                                onNavigateToClima = { navController.navigate("clima") },
+                                onNavigateToCarrito = { navController.navigate("carrito") }
                             )
                         }
 
-                        // Registro de usuario
                         composable("formulario") {
                             FormularioScreen(
                                 viewModel = usuarioViewModel,
@@ -78,7 +74,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Resumen de usuarios
                         composable("resumen") {
                             ResumenScreen(
                                 viewModel = usuarioViewModel,
@@ -87,7 +82,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Perfil genérico
                         composable("perfil") {
                             PerfilScreen(
                                 usuarioId = null,
@@ -96,7 +90,6 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Perfil de usuario específico
                         composable("perfil/{usuarioId}") { backStackEntry ->
                             val usuarioId = backStackEntry.arguments?.getString("usuarioId")
                             PerfilScreen(
@@ -106,17 +99,23 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // Catálogo de productos
                         composable("producto") {
-                            ProductoScreen(onNavigateBack = { navController.navigateUp() })
+                            ProductoScreen(
+                                onNavigateBack = { navController.navigateUp() },
+                                productoViewModel = productoViewModel,
+                                carritoViewModel = carritoViewModel
+                            )
                         }
 
-                        // Pantalla de Clima
-                        composable("clima") {
-                            ClimaScreen()
+                        composable("carrito") {
+                            CarritoScreen(
+                                carritoViewModel = carritoViewModel,
+                                onNavigateBack = { navController.navigateUp() } 
+                            )
                         }
 
-                        // Ajustes
+                        composable("clima") { ClimaScreen() }
+
                         composable("ajustes") {
                             AjustesScreen(
                                 onNavigateBack = { navController.navigateUp() },

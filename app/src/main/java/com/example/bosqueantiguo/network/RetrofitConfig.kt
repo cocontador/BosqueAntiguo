@@ -7,95 +7,56 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-/**
- * Configuración centralizada de Retrofit
- * Aquí se configura el cliente HTTP y la URL base de los microservicios
- */
 object RetrofitConfig {
     
     private const val TAG = "RetrofitConfig"
     
-    // URLs posibles para el microservicio de productos y autenticación
-    private const val BASE_URL_EMULATOR = "http://192.168.1.4:8082/"  // Para emulador
-    private const val BASE_URL_DEVICE = "http://192.168.1.4:8082/"  // Para dispositivo físico (cambiar por tu IP local)
-    private const val BASE_URL_LOCALHOST = "http://localhost:8082/"  // Para pruebas
-    
-    // URL base actual para el backend (usa emulador por defecto)
-    private const val BASE_URL_BACKEND = BASE_URL_EMULATOR
-
-    // URL base para el servicio de clima (ej: OpenWeatherMap)
+    private const val BASE_URL_PRODUCTOS_EMULATOR = "http://10.0.2.2:8080/"
+    private const val BASE_URL_VENTAS_EMULATOR = "http://10.0.2.2:8081/"
     private const val BASE_URL_CLIMA = "https://api.openweathermap.org/data/2.5/"
+
+    private const val IP_DISPOSITIVO_FISICO = "192.168.1.X"
+    private const val BASE_URL_PRODUCTOS_DEVICE = "http://$IP_DISPOSITIVO_FISICO:8080/"
+    private const val BASE_URL_VENTAS_DEVICE = "http://$IP_DISPOSITIVO_FISICO:8081/"
+
+    private const val USE_DEVICE_URLS = true 
+
+    private val BASE_URL_BACKEND = if (USE_DEVICE_URLS) BASE_URL_PRODUCTOS_DEVICE else BASE_URL_PRODUCTOS_EMULATOR
+    private val BASE_URL_VENTAS = if (USE_DEVICE_URLS) BASE_URL_VENTAS_DEVICE else BASE_URL_VENTAS_EMULATOR
     
     init {
-        Log.d(TAG, "🔧 Inicializando RetrofitConfig")
-        Log.d(TAG, "🌐 URL Base Backend: $BASE_URL_BACKEND")
-        Log.d(TAG, "🌦️ URL Base Clima: $BASE_URL_CLIMA")
-        Log.i(TAG, "🔓 Network Security Config habilitado para HTTP")
-        Log.w(TAG, "⚠️ Si no funciona, verifica que el microservicio del backend esté en puerto 8082")
+        Log.d(TAG, "Inicializando RetrofitConfig")
+        Log.d(TAG, "URL Base Backend (Productos/Auth): $BASE_URL_BACKEND")
+        Log.d(TAG, "URL Base Ventas: $BASE_URL_VENTAS")
+        Log.d(TAG, "URL Base Clima: $BASE_URL_CLIMA")
     }
     
-    // Cliente HTTP con configuración de logging para debug
     private val okHttpClient = OkHttpClient.Builder()
-        .addInterceptor(
-            HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-                Log.d(TAG, "📝 HttpLoggingInterceptor configurado con nivel BODY")
-            }
-        )
+        .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor { chain ->
-            val request = chain.request()
-            Log.d(TAG, "🚀 Petición saliente:")
-            Log.d(TAG, "   - URL: ${request.url}")
-            Log.d(TAG, "   - Método: ${request.method}")
-            Log.d(TAG, "   - Headers: ${request.headers}")
-            
-            val response = chain.proceed(request)
-            Log.d(TAG, "📥 Respuesta recibida:")
-            Log.d(TAG, "   - Código: ${response.code}")
-            Log.d(TAG, "   - Mensaje: ${response.message}")
-            Log.d(TAG, "   - URL: ${response.request.url}")
-            
-            response
-        }
         .build()
     
-    // Instancia de Retrofit para el Backend (Productos, Auth, etc.)
     private val retrofitBackend = Retrofit.Builder()
         .baseUrl(BASE_URL_BACKEND)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    // Instancia de Retrofit para Clima
+    private val retrofitVentas = Retrofit.Builder()
+        .baseUrl(BASE_URL_VENTAS)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
     private val retrofitClima = Retrofit.Builder()
         .baseUrl(BASE_URL_CLIMA)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     
-    // Service para productos
-    val productoApiService: ProductoApiService by lazy {
-        Log.d(TAG, "🏭 Creando ProductoApiService...")
-        val service = retrofitBackend.create(ProductoApiService::class.java)
-        Log.d(TAG, "✅ ProductoApiService creado exitosamente")
-        service
-    }
-
-    // Service para clima
-    val climaApiService: ClimaApiService by lazy {
-        Log.d(TAG, "🏭 Creando ClimaApiService...")
-        val service = retrofitClima.create(ClimaApiService::class.java)
-        Log.d(TAG, "✅ ClimaApiService creado exitosamente")
-        service
-    }
-
-    // Service para autenticación
-    val authApiService: AuthApiService by lazy {
-        Log.d(TAG, "🏭 Creando AuthApiService...")
-        val service = retrofitBackend.create(AuthApiService::class.java)
-        Log.d(TAG, "✅ AuthApiService creado exitosamente")
-        service
-    }
+    val productoApiService: ProductoApiService by lazy { retrofitBackend.create(ProductoApiService::class.java) }
+    val authApiService: AuthApiService by lazy { retrofitBackend.create(AuthApiService::class.java) }
+    val ventaApiService: VentaApiService by lazy { retrofitVentas.create(VentaApiService::class.java) }
+    val climaApiService: ClimaApiService by lazy { retrofitClima.create(ClimaApiService::class.java) }
 }
