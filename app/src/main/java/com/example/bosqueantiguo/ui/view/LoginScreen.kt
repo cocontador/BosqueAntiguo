@@ -24,7 +24,7 @@ import com.example.bosqueantiguo.ui.viewmodel.LoginUiState
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(),
     onLoginSuccess: () -> Unit,
-    onNavigateToRegistro: () -> Unit // Nuevo parámetro para navegar al registro
+    onNavigateToRegistro: () -> Unit
 ) {
 
     val loginState by authViewModel.loginState.collectAsState()
@@ -63,7 +63,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Contenedor para el botón de Login y el estado de carga
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             when (val state = loginState) {
                 is LoginUiState.Idle -> {
@@ -80,6 +79,7 @@ fun LoginScreen(
                 }
                 is LoginUiState.Success -> {
                     LaunchedEffect(Unit) {
+                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
                         onLoginSuccess()
                     }
                 }
@@ -92,7 +92,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón para navegar a la pantalla de registro
         TextButton(onClick = onNavigateToRegistro) {
             Text("¿No tienes una cuenta? Regístrate")
         }

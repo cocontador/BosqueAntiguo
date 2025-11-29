@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +41,8 @@ fun MainScreen(
     onNavigateToProducto: () -> Unit,
     onNavigateToResumen: () -> Unit,
     onNavigateToClima: () -> Unit,
-    onNavigateToCarrito: () -> Unit
+    onNavigateToCarrito: () -> Unit,
+    onNavigateToLogin: () -> Unit // Parámetro para el login
 ) {
     Scaffold(
         topBar = {
@@ -49,6 +51,10 @@ fun MainScreen(
                 actions = {
                     IconButton(onClick = onNavigateToCarrito) {
                         Icon(Icons.Filled.ShoppingCart, contentDescription = "Carrito de compras")
+                    }
+                    // Restaurado: IconButton para Login/Perfil
+                    IconButton(onClick = onNavigateToLogin) {
+                        Icon(Icons.Filled.Person, contentDescription = "Iniciar Sesión")
                     }
                 }
             )

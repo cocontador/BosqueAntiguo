@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                             LoginScreen(
                                 onLoginSuccess = {
                                     navController.navigate("main") {
-                                        popUpTo("login") { inclusive = true }
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                                         launchSingleTop = true
                                     }
                                 },
@@ -57,7 +57,8 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToProducto = { navController.navigate("producto") },
                                 onNavigateToResumen = { navController.navigate("resumen") },
                                 onNavigateToClima = { navController.navigate("clima") },
-                                onNavigateToCarrito = { navController.navigate("carrito") }
+                                onNavigateToCarrito = { navController.navigate("carrito") },
+                                onNavigateToLogin = { navController.navigate("login") } // Restaurado
                             )
                         }
 

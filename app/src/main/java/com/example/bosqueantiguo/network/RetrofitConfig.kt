@@ -11,24 +11,32 @@ object RetrofitConfig {
     
     private const val TAG = "RetrofitConfig"
     
-    private const val BASE_URL_PRODUCTOS_EMULATOR = "http://10.0.2.2:8080/"
-    private const val BASE_URL_VENTAS_EMULATOR = "http://10.0.2.2:8081/"
+    // --- Configuración de Red ---
+    private const val IP_EMULADOR = "10.0.2.2"
+    private const val IP_DISPOSITIVO_FISICO = "192.168.1.X"
+
+    // --- Puertos de los Microservicios ---
+    private const val PUERTO_PRODUCTOS = "8080"
+    private const val PUERTO_VENTAS = "8081"
+    private const val PUERTO_USUARIOS = "8082"
+
+    // --- Configuración Activa ---
+    // Cambia a false si estás usando el emulador en lugar de un dispositivo físico
+    private const val USE_DEVICE_URLS = true 
+    private val ACTIVE_IP = if (USE_DEVICE_URLS) IP_DISPOSITIVO_FISICO else IP_EMULADOR
+
+    // --- URLs Base Finales ---
+    private val BASE_URL_PRODUCTOS = "http://$ACTIVE_IP:$PUERTO_PRODUCTOS/"
+    private val BASE_URL_VENTAS = "http://$ACTIVE_IP:$PUERTO_VENTAS/"
+    private val BASE_URL_USUARIOS = "http://$ACTIVE_IP:$PUERTO_USUARIOS/"
     private const val BASE_URL_CLIMA = "https://api.openweathermap.org/data/2.5/"
 
-    private const val IP_DISPOSITIVO_FISICO = "192.168.1.X"
-    private const val BASE_URL_PRODUCTOS_DEVICE = "http://$IP_DISPOSITIVO_FISICO:8080/"
-    private const val BASE_URL_VENTAS_DEVICE = "http://$IP_DISPOSITIVO_FISICO:8081/"
-
-    private const val USE_DEVICE_URLS = true 
-
-    private val BASE_URL_BACKEND = if (USE_DEVICE_URLS) BASE_URL_PRODUCTOS_DEVICE else BASE_URL_PRODUCTOS_EMULATOR
-    private val BASE_URL_VENTAS = if (USE_DEVICE_URLS) BASE_URL_VENTAS_DEVICE else BASE_URL_VENTAS_EMULATOR
-    
     init {
         Log.d(TAG, "Inicializando RetrofitConfig")
-        Log.d(TAG, "URL Base Backend (Productos/Auth): $BASE_URL_BACKEND")
-        Log.d(TAG, "URL Base Ventas: $BASE_URL_VENTAS")
-        Log.d(TAG, "URL Base Clima: $BASE_URL_CLIMA")
+        Log.d(TAG, "IP Activa: $ACTIVE_IP")
+        Log.d(TAG, "URL Productos: $BASE_URL_PRODUCTOS")
+        Log.d(TAG, "URL Usuarios/Auth: $BASE_URL_USUARIOS")
+        Log.d(TAG, "URL Ventas: $BASE_URL_VENTAS")
     }
     
     private val okHttpClient = OkHttpClient.Builder()
@@ -37,26 +45,23 @@ object RetrofitConfig {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
     
-    private val retrofitBackend = Retrofit.Builder()
-        .baseUrl(BASE_URL_BACKEND)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    // --- Instancias de Retrofit ---
+    private fun buildRetrofit(baseUrl: String): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    private val retrofitVentas = Retrofit.Builder()
-        .baseUrl(BASE_URL_VENTAS)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    private val retrofitProductos = buildRetrofit(BASE_URL_PRODUCTOS)
+    private val retrofitVentas = buildRetrofit(BASE_URL_VENTAS)
+    private val retrofitUsuarios = buildRetrofit(BASE_URL_USUARIOS)
+    private val retrofitClima = buildRetrofit(BASE_URL_CLIMA)
 
-    private val retrofitClima = Retrofit.Builder()
-        .baseUrl(BASE_URL_CLIMA)
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    
-    val productoApiService: ProductoApiService by lazy { retrofitBackend.create(ProductoApiService::class.java) }
-    val authApiService: AuthApiService by lazy { retrofitBackend.create(AuthApiService::class.java) }
+    // --- Servicios de API ---
+    val productoApiService: ProductoApiService by lazy { retrofitProductos.create(ProductoApiService::class.java) }
+    val authApiService: AuthApiService by lazy { retrofitUsuarios.create(AuthApiService::class.java) }
     val ventaApiService: VentaApiService by lazy { retrofitVentas.create(VentaApiService::class.java) }
     val climaApiService: ClimaApiService by lazy { retrofitClima.create(ClimaApiService::class.java) }
 }
