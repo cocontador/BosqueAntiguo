@@ -24,7 +24,8 @@ import com.example.bosqueantiguo.ui.viewmodel.LoginUiState
 fun LoginScreen(
     authViewModel: AuthViewModel = viewModel(),
     onLoginSuccess: () -> Unit,
-    onNavigateToRegistro: () -> Unit
+    onNavigateToRegistro: () -> Unit,
+    onNavigateToRecuperar: () -> Unit // Nuevo parámetro
 ) {
 
     val loginState by authViewModel.loginState.collectAsState()
@@ -61,7 +62,14 @@ fun LoginScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        // Botón para recuperar contraseña
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(onClick = onNavigateToRecuperar) {
+                Text("¿Olvidaste tu contraseña?")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             when (val state = loginState) {

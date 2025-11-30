@@ -45,7 +45,15 @@ class MainActivity : ComponentActivity() {
                                 onLoginSuccess = {
                                     navController.navigate("main") { popUpTo(navController.graph.startDestinationId) { inclusive = true }; launchSingleTop = true }
                                 },
-                                onNavigateToRegistro = { navController.navigate("formulario") }
+                                onNavigateToRegistro = { navController.navigate("formulario") },
+                                onNavigateToRecuperar = { navController.navigate("recuperar") } // Conectado
+                            )
+                        }
+
+                        // Nueva pantalla de recuperación
+                        composable("recuperar") {
+                            RecuperarScreen(
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
 
