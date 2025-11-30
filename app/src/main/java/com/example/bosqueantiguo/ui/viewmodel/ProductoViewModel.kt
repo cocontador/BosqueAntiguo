@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bosqueantiguo.model.ProductoApi
-import com.example.bosqueantiguo.network.NetworkTester
 import com.example.bosqueantiguo.repository.ProductoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +20,6 @@ class ProductoViewModel : ViewModel() {
     
     init {
         Log.d(TAG, "ProductoViewModel inicializado")
-        NetworkTester.probarConectividad()
     }
     
     private val _productos = MutableStateFlow<List<ProductoApi>>(emptyList())
@@ -38,10 +36,9 @@ class ProductoViewModel : ViewModel() {
             _isLoading.value = true
             _hasError.value = false
             try {
-                repository.obtenerProductos().collect { listaProductos ->
-                    val productosValidos = listaProductos.filter { it.nombre.isNotEmpty() && it.precio >= 0 }
-                    _productos.value = productosValidos
-                    _hasError.value = productosValidos.isEmpty()
+                // CORREGIDO: Pedimos TODOS los productos, no solo los disponibles.
+                repository.obtenerProductos(soloDisponibles = false).collect { listaProductos ->
+                    _productos.value = listaProductos
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error en ViewModel al cargar productos:", e)

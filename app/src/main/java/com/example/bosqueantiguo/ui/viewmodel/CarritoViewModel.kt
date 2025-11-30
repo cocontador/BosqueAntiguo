@@ -43,10 +43,8 @@ class CarritoViewModel : ViewModel() {
         _carritoItems.update { currentItems ->
             val existingItem = currentItems.find { it.producto.id == producto.id }
             if (existingItem != null) {
-                Log.d(TAG, "Cantidad incrementada para: ${producto.nombre}")
                 currentItems.map { if (it.producto.id == producto.id) it.copy(cantidad = it.cantidad + 1) else it }
             } else {
-                Log.d(TAG, "Producto añadido: ${producto.nombre}")
                 currentItems + CarritoItem(producto = producto, cantidad = 1)
             }
         }
@@ -55,7 +53,6 @@ class CarritoViewModel : ViewModel() {
 
     fun removerProducto(productoId: Long) {
         _carritoItems.update { currentItems ->
-            Log.d(TAG, "Producto eliminado con ID: $productoId")
             currentItems.filterNot { it.producto.id == productoId }
         }
         actualizarTotal()
@@ -66,7 +63,6 @@ class CarritoViewModel : ViewModel() {
             removerProducto(productoId)
             return
         }
-
         _carritoItems.update { currentItems ->
             currentItems.map { if (it.producto.id == productoId) it.copy(cantidad = nuevaCantidad) else it }
         }
@@ -75,10 +71,7 @@ class CarritoViewModel : ViewModel() {
 
     fun procesarPago() {
         viewModelScope.launch {
-            if (_carritoItems.value.isEmpty()) {
-                Log.w(TAG, "Intento de procesar pago con carrito vacío.")
-                return@launch
-            }
+            if (_carritoItems.value.isEmpty()) return@launch
 
             _ventaState.value = VentaUiState.Loading
 
@@ -91,26 +84,29 @@ class CarritoViewModel : ViewModel() {
 
             if (resultado != null) {
                 _ventaState.value = VentaUiState.Success(resultado)
-                limpiarCarrito()
+                // NO limpiamos el carrito aquí. Se hará desde la pantalla de confirmación.
             } else {
                 _ventaState.value = VentaUiState.Error("No se pudo procesar la venta.")
             }
         }
     }
+    
+    fun finalizarCompraYLimpiar() {
+        limpiarCarrito()
+        resetVentaState()
+    }
 
-    fun resetVentaState() {
+    private fun resetVentaState() {
         _ventaState.value = VentaUiState.Idle
     }
 
     private fun limpiarCarrito() {
         _carritoItems.value = emptyList()
-        Log.d(TAG, "Carrito limpiado.")
         actualizarTotal()
     }
 
     private fun actualizarTotal() {
         val total = _carritoItems.value.sumOf { it.producto.precio * it.cantidad }
         _totalPrecio.value = total
-        Log.d(TAG, "Total actualizado: $$total")
     }
 }

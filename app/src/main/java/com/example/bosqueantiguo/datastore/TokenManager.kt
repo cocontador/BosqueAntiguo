@@ -1,0 +1,39 @@
+package com.example.bosqueantiguo.datastore
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+// Se crea una instancia de DataStore a nivel de archivo
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_prefs")
+
+class TokenManager(private val context: Context) {
+
+    companion object {
+        private val TOKEN_KEY = stringPreferencesKey("jwt_token")
+    }
+
+    // Flujo para observar el token
+    val tokenFlow: Flow<String?> = context.dataStore.data.map {
+        it[TOKEN_KEY]
+    }
+
+    // Función para guardar el token
+    suspend fun saveToken(token: String) {
+        context.dataStore.edit {
+            it[TOKEN_KEY] = token
+        }
+    }
+
+    // Función para borrar el token
+    suspend fun clearToken() {
+        context.dataStore.edit {
+            it.remove(TOKEN_KEY)
+        }
+    }
+}

@@ -13,9 +13,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.*
 import com.example.bosqueantiguo.ui.viewmodel.CarritoViewModel
+import com.example.bosqueantiguo.ui.viewmodel.CategoriaViewModel
 import com.example.bosqueantiguo.ui.viewmodel.ProductoViewModel
+import com.example.bosqueantiguo.ui.viewmodel.UsuarioViewModelFactory
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
-import com.example.bosqueantiguo.viewmodel.UsuarioViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,27 +24,26 @@ class MainActivity : ComponentActivity() {
 
         installSplashScreen()
 
-        val usuarioRepository = (application as BosqueAntiguoApp).usuarioRepository
-
         setContent {
             BosqueAntiguoTheme {
                 Surface(color = MaterialTheme.colorScheme.background) {
 
                     val navController = rememberNavController()
-                    val factory = UsuarioViewModelFactory(usuarioRepository)
+                    
+                    val app = application as BosqueAntiguoApp
+                    val factory = UsuarioViewModelFactory(app.usuarioRepository)
+                    
                     val usuarioViewModel: UsuarioViewModel = viewModel(factory = factory)
                     val carritoViewModel: CarritoViewModel = viewModel()
                     val productoViewModel: ProductoViewModel = viewModel()
+                    val categoriaViewModel: CategoriaViewModel = viewModel()
 
                     NavHost(navController = navController, startDestination = "main") {
 
                         composable("login") {
                             LoginScreen(
                                 onLoginSuccess = {
-                                    navController.navigate("main") {
-                                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                                        launchSingleTop = true
-                                    }
+                                    navController.navigate("main") { popUpTo(navController.graph.startDestinationId) { inclusive = true }; launchSingleTop = true }
                                 },
                                 onNavigateToRegistro = { navController.navigate("formulario") }
                             )
@@ -54,23 +54,35 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToRegistro = { navController.navigate("formulario") },
                                 onNavigateToPerfil = { navController.navigate("perfil") },
                                 onNavigateToAjustes = { navController.navigate("ajustes") },
-                                onNavigateToProducto = { navController.navigate("producto") },
+                                onNavigateToProducto = { navController.navigate("categorias") },
                                 onNavigateToResumen = { navController.navigate("resumen") },
                                 onNavigateToClima = { navController.navigate("clima") },
                                 onNavigateToCarrito = { navController.navigate("carrito") },
-                                onNavigateToLogin = { navController.navigate("login") } // Restaurado
+                                onNavigateToLogin = { navController.navigate("login") },
+                                carritoViewModel = carritoViewModel
+                            )
+                        }
+
+                        composable("categorias") {
+                            CategoriaScreen(
+                                onNavigateBack = { navController.navigateUp() },
+                                onCategoriaClick = { navController.navigate("producto") },
+                                categoriaViewModel = categoriaViewModel
+                            )
+                        }
+
+                        composable("producto") {
+                            ProductoScreen(
+                                onNavigateBack = { navController.navigateUp() },
+                                productoViewModel = productoViewModel,
+                                carritoViewModel = carritoViewModel
                             )
                         }
 
                         composable("formulario") {
                             FormularioScreen(
                                 viewModel = usuarioViewModel,
-                                onGuardado = {
-                                    navController.navigate("resumen") {
-                                        popUpTo("main") { inclusive = false }
-                                        launchSingleTop = true
-                                    }
-                                },
+                                onGuardado = { navController.navigate("resumen") { popUpTo("main") { inclusive = false }; launchSingleTop = true } },
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }
@@ -100,28 +112,29 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("producto") {
-                            ProductoScreen(
+                        composable("carrito") {
+                            CarritoScreen(
+                                carritoViewModel = carritoViewModel, 
                                 onNavigateBack = { navController.navigateUp() },
-                                productoViewModel = productoViewModel,
-                                carritoViewModel = carritoViewModel
+                                onNavigateToConfirmacion = { navController.navigate("confirmacion") }
                             )
                         }
 
-                        composable("carrito") {
-                            CarritoScreen(
+                        composable("confirmacion") {
+                            VentaConfirmacionScreen(
                                 carritoViewModel = carritoViewModel,
-                                onNavigateBack = { navController.navigateUp() } 
+                                onVolverATienda = {
+                                    navController.navigate("main") {
+                                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                    }
+                                }
                             )
                         }
 
                         composable("clima") { ClimaScreen() }
 
                         composable("ajustes") {
-                            AjustesScreen(
-                                onNavigateBack = { navController.navigateUp() },
-                                onExitApp = { finish() }
-                            )
+                            AjustesScreen(onNavigateBack = { navController.navigateUp() }, onExitApp = { finish() })
                         }
                     }
                 }

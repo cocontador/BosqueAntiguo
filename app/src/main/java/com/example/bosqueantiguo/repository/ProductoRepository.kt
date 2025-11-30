@@ -25,14 +25,14 @@ class ProductoRepository {
             Log.d(TAG, "Respuesta recibida:")
             Log.d(TAG, "   - Código: ${response.code()}")
             Log.d(TAG, "   - Mensaje: ${response.message()}")
-            Log.d(TAG, "   - Es exitosa: ${response.isSuccessful}")
+            Log.d(TAG, "   - Es exitosa: ${response.isSuccessful()}") // CORREGIDO
             Log.d(TAG, "   - Headers: ${response.headers()}")
             
             if (response.isSuccessful) {
                 response.body()?.let { productos ->
                     Log.d(TAG, "Productos recibidos: ${productos.size} items")
                     productos.forEachIndexed { index, producto ->
-                        Log.d(TAG, "   $index: ${producto.codigo ?: "SIN_CODIGO"} - ${producto.nombre} (Stock: ${producto.stock})")
+                        Log.d(TAG, "   $index: ID ${producto.id} - ${producto.nombre} (Stock: ${producto.stock})")
                     }
                     emit(productos)
                 } ?: run {
