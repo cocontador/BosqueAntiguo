@@ -10,7 +10,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.bosqueantiguo.repository.AuthRepository
 import com.example.bosqueantiguo.repository.ProductoRepository
+import com.example.bosqueantiguo.repository.VentaRepository
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.*
 import com.example.bosqueantiguo.ui.viewmodel.*
@@ -31,12 +33,15 @@ class MainActivity : ComponentActivity() {
                     // --- Inyección de Dependencias Manual ---
                     val app = application as BosqueAntiguoApp
                     val productoRepository = ProductoRepository()
+                    val ventaRepository = VentaRepository()
+                    val authRepository = AuthRepository()
 
                     val usuarioViewModel: UsuarioViewModel = viewModel(factory = UsuarioViewModelFactory(app.usuarioRepository))
                     val productoViewModel: ProductoViewModel = viewModel(factory = ProductoViewModelFactory(productoRepository))
+                    val carritoViewModel: CarritoViewModel = viewModel(factory = CarritoViewModelFactory(ventaRepository))
+                    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository, app.tokenManager))
+
                     val categoriaViewModel: CategoriaViewModel = viewModel()
-                    val carritoViewModel: CarritoViewModel = viewModel()
-                    val authViewModel: AuthViewModel = viewModel()
 
                     NavHost(navController = navController, startDestination = "main") {
 
@@ -51,9 +56,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         
-                        composable("recuperar") {
-                            RecuperarScreen(onNavigateBack = { navController.popBackStack() })
-                        }
+                        composable("recuperar") { RecuperarScreen(onNavigateBack = { navController.popBackStack() }) }
 
                         composable("main") {
                             MainScreen(

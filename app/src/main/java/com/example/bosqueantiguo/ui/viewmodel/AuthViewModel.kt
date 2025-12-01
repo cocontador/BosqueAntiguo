@@ -2,9 +2,9 @@ package com.example.bosqueantiguo.ui.viewmodel
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.bosqueantiguo.BosqueAntiguoApp
+import com.example.bosqueantiguo.datastore.TokenManager
 import com.example.bosqueantiguo.model.LoginResponse
 import com.example.bosqueantiguo.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,15 +19,15 @@ sealed class LoginUiState {
     data class Error(val message: String) : LoginUiState()
 }
 
-// Cambiado a AndroidViewModel para tener acceso al contexto de la aplicación
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+// CORREGIDO: Se convierte en un ViewModel normal y recibe sus dependencias.
+class AuthViewModel( 
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager
+) : ViewModel() {
 
     companion object {
         private const val TAG = "AuthViewModel"
     }
-
-    private val authRepository = AuthRepository()
-    private val tokenManager = getApplication<BosqueAntiguoApp>().tokenManager
 
     private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val loginState: StateFlow<LoginUiState> = _loginState.asStateFlow()
@@ -41,7 +41,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             val response = authRepository.login(email, password)
 
             if (response != null) {
-                // Guardar el token
                 tokenManager.saveToken(response.token)
                 _loginState.value = LoginUiState.Success(response)
                 Log.d(TAG, "Estado: Success. Token guardado.")

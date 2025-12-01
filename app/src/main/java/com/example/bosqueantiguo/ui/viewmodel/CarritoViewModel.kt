@@ -22,13 +22,12 @@ sealed class VentaUiState {
     data class Error(val message: String) : VentaUiState()
 }
 
-class CarritoViewModel : ViewModel() {
+// CORREGIDO: Ahora recibe su dependencia por el constructor
+class CarritoViewModel(private val ventaRepository: VentaRepository) : ViewModel() {
 
     companion object {
         private const val TAG = "CarritoViewModel"
     }
-
-    private val ventaRepository = VentaRepository()
 
     private val _carritoItems = MutableStateFlow<List<CarritoItem>>(emptyList())
     val carritoItems: StateFlow<List<CarritoItem>> = _carritoItems.asStateFlow()
@@ -84,7 +83,6 @@ class CarritoViewModel : ViewModel() {
 
             if (resultado != null) {
                 _ventaState.value = VentaUiState.Success(resultado)
-                // NO limpiamos el carrito aquí. Se hará desde la pantalla de confirmación.
             } else {
                 _ventaState.value = VentaUiState.Error("No se pudo procesar la venta.")
             }
