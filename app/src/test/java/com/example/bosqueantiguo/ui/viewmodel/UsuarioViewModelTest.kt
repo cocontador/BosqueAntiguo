@@ -1,9 +1,8 @@
 package com.example.bosqueantiguo.ui.viewmodel
 
 import android.util.Log
+import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 import com.example.bosqueantiguo.repository.UsuarioRepository
-// CORRECCIÓN: Se importa el ViewModel desde el paquete correcto, que es la raíz del problema.
-import com.example.bosqueantiguo.viewmodel.UsuarioViewModel 
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -19,6 +18,8 @@ import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+
+// NOTA: Se eliminó @RunWith(AndroidJUnit4::class) porque esto es una prueba unitaria local.
 
 @ExperimentalCoroutinesApi
 class UsuarioViewModelTest {
@@ -36,9 +37,6 @@ class UsuarioViewModelTest {
         every { Log.d(any(), any()) } returns 0
 
         usuarioRepository = mockk(relaxed = true)
-        // Le decimos al mock que la función insertarUsuario no hace nada y devuelve Unit
-        coEvery { usuarioRepository.insertarUsuario(any()) } returns Unit
-
         viewModel = UsuarioViewModel(usuarioRepository)
     }
 
@@ -61,14 +59,13 @@ class UsuarioViewModelTest {
         viewModel.onCorreoChange("correo@valido.com")
         viewModel.onEdadChange("25")
         viewModel.onContrasenaChange("Password123")
+        coEvery { usuarioRepository.insertarUsuario(any()) } returns Unit
 
         // Act
         viewModel.guardarUsuario()
-        // Avanzamos el dispatcher para que se ejecute la coroutine del viewModelScope
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        // Verificamos que la función del repositorio fue llamada exactamente 1 vez.
         coVerify(exactly = 1) { usuarioRepository.insertarUsuario(any()) }
         assertTrue(viewModel.uiState.value.guardadoExitoso)
     }
@@ -86,8 +83,7 @@ class UsuarioViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Assert
-        // Verificamos que la función del repositorio NUNCA fue llamada.
-        coVerify(exactly = 0) { usuarioRepository.insertarUsuario(any()) }
+        coVerify(exactly = 0) { usuarioRepository.insertarUsuario(any()) } // Verificamos que NUNCA se llama al repositorio
         assertFalse(viewModel.uiState.value.guardadoExitoso)
         assertNotNull(viewModel.uiState.value.errores.correoError)
     }

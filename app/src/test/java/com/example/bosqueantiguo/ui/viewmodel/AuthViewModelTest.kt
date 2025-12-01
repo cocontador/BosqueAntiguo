@@ -49,35 +49,35 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `doLogin con credenciales válidas, actualiza el estado a Success y guarda el token`() = runTest {
-        // Arrange: Creamos los mocks correctos que coinciden con tus modelos de datos
+    fun `doLogin con credenciales válidas, emite Loading y luego Success`() = runTest {
+        // Arrange
         val usuarioApiMock = mockk<UsuarioApi>(relaxed = true)
         val loginResponseMock = LoginResponse(token = "token_de_prueba", usuario = usuarioApiMock)
-        
         coEvery { authRepository.login(any(), any()) } returns loginResponseMock
 
         // Act y Assert
         viewModel.loginState.test {
-            assertEquals(LoginUiState.Idle, awaitItem())
+            assertEquals("El estado inicial debe ser Idle", LoginUiState.Idle, awaitItem())
 
             viewModel.doLogin("test@test.com", "password")
-            testDispatcher.scheduler.advanceUntilIdle() // Avanzamos el dispatcher
-
-            // Verificamos que el estado cambia a Loading y luego a Success
-            val loadingState = awaitItem()
-            assertTrue(loadingState is LoginUiState.Loading)
-
+            
+            // Verificamos la secuencia de estados
+            assertEquals("Debe cambiar a Loading", LoginUiState.Loading, awaitItem())
+            
             val successState = awaitItem()
-            assertTrue(successState is LoginUiState.Success)
+            assertTrue("El estado final debe ser Success", successState is LoginUiState.Success)
             assertEquals(loginResponseMock, (successState as LoginUiState.Success).loginResponse)
 
-            // Verificamos que se intentó guardar el token
+            // Verificamos que se guardó el token
             coVerify(exactly = 1) { tokenManager.saveToken(loginResponseMock.token) }
+            
+            // Nos aseguramos de que no haya más emisiones
+            expectNoEvents()
         }
     }
 
     @Test
-    fun `doLogin con credenciales inválidas, actualiza el estado a Error`() = runTest {
+    fun `doLogin con credenciales inválidas, emite Loading y luego Error`() = runTest {
         // Arrange
         coEvery { authRepository.login(any(), any()) } returns null // Simulamos un fallo
 
@@ -86,13 +86,11 @@ class AuthViewModelTest {
             assertEquals(LoginUiState.Idle, awaitItem())
 
             viewModel.doLogin("test@test.com", "password_incorrecto")
-            testDispatcher.scheduler.advanceUntilIdle()
 
-            val loadingState = awaitItem()
-            assertTrue(loadingState is LoginUiState.Loading)
-            
-            val errorState = awaitItem()
-            assertTrue(errorState is LoginUiState.Error)
+            assertEquals(LoginUiState.Loading, awaitItem())
+            assertTrue(awaitItem() is LoginUiState.Error)
+
+            expectNoEvents()
         }
     }
 }
