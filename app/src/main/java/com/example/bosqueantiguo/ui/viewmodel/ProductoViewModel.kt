@@ -10,13 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ProductoViewModel : ViewModel() {
+// CORREGIDO: El ViewModel ahora recibe el repositorio por inyección de dependencias
+class ProductoViewModel(private val repository: ProductoRepository) : ViewModel() {
     
     companion object {
         private const val TAG = "ProductoViewModel"
     }
-    
-    private val repository = ProductoRepository()
     
     init {
         Log.d(TAG, "ProductoViewModel inicializado")
@@ -36,7 +35,6 @@ class ProductoViewModel : ViewModel() {
             _isLoading.value = true
             _hasError.value = false
             try {
-                // CORREGIDO: Pedimos TODOS los productos, no solo los disponibles.
                 repository.obtenerProductos(soloDisponibles = false).collect { listaProductos ->
                     _productos.value = listaProductos
                 }

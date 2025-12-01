@@ -10,12 +10,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.bosqueantiguo.repository.ProductoRepository
 import com.example.bosqueantiguo.ui.theme.BosqueAntiguoTheme
 import com.example.bosqueantiguo.ui.view.*
-import com.example.bosqueantiguo.ui.viewmodel.CarritoViewModel
-import com.example.bosqueantiguo.ui.viewmodel.CategoriaViewModel
-import com.example.bosqueantiguo.ui.viewmodel.ProductoViewModel
-import com.example.bosqueantiguo.ui.viewmodel.UsuarioViewModelFactory
+import com.example.bosqueantiguo.ui.viewmodel.*
 import com.example.bosqueantiguo.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
@@ -30,31 +28,31 @@ class MainActivity : ComponentActivity() {
 
                     val navController = rememberNavController()
                     
+                    // --- Inyección de Dependencias Manual ---
                     val app = application as BosqueAntiguoApp
-                    val factory = UsuarioViewModelFactory(app.usuarioRepository)
-                    
-                    val usuarioViewModel: UsuarioViewModel = viewModel(factory = factory)
-                    val carritoViewModel: CarritoViewModel = viewModel()
-                    val productoViewModel: ProductoViewModel = viewModel()
+                    val productoRepository = ProductoRepository()
+
+                    val usuarioViewModel: UsuarioViewModel = viewModel(factory = UsuarioViewModelFactory(app.usuarioRepository))
+                    val productoViewModel: ProductoViewModel = viewModel(factory = ProductoViewModelFactory(productoRepository))
                     val categoriaViewModel: CategoriaViewModel = viewModel()
+                    val carritoViewModel: CarritoViewModel = viewModel()
+                    val authViewModel: AuthViewModel = viewModel()
 
                     NavHost(navController = navController, startDestination = "main") {
 
                         composable("login") {
                             LoginScreen(
+                                authViewModel = authViewModel,
                                 onLoginSuccess = {
                                     navController.navigate("main") { popUpTo(navController.graph.startDestinationId) { inclusive = true }; launchSingleTop = true }
                                 },
                                 onNavigateToRegistro = { navController.navigate("formulario") },
-                                onNavigateToRecuperar = { navController.navigate("recuperar") } // Conectado
+                                onNavigateToRecuperar = { navController.navigate("recuperar") }
                             )
                         }
-
-                        // Nueva pantalla de recuperación
+                        
                         composable("recuperar") {
-                            RecuperarScreen(
-                                onNavigateBack = { navController.popBackStack() }
-                            )
+                            RecuperarScreen(onNavigateBack = { navController.popBackStack() })
                         }
 
                         composable("main") {

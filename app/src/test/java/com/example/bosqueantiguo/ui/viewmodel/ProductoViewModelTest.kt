@@ -1,89 +1,83 @@
 package com.example.bosqueantiguo.ui.viewmodel
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.bosqueantiguo.model.Categoria
+import android.util.Log
+import app.cash.turbine.test
 import com.example.bosqueantiguo.model.ProductoApi
+import com.example.bosqueantiguo.repository.ProductoRepository
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-/**
- * Pruebas unitarias para ProductoViewModel
- * Verifica el comportamiento del ViewModel sin conexión real a la API
- */
+// Se ha eliminado la clase MainDispatcherRule para simplificar el código y atacar el error de referencia.
+
 @ExperimentalCoroutinesApi
-@RunWith(AndroidJUnit4::class)
 class ProductoViewModelTest {
 
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
+    // Se define el dispatcher directamente en la clase de prueba.
     private val testDispatcher = StandardTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
-    
+
+    private lateinit var productoRepository: ProductoRepository
     private lateinit var viewModel: ProductoViewModel
 
     @Before
     fun setUp() {
-        viewModel = ProductoViewModel()
+        // Se establece el dispatcher principal ANTES de cada prueba.
+        Dispatchers.setMain(testDispatcher)
+        
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
+        every { Log.e(any(), any<String>()) } returns 0
+        every { Log.e(any(), any(), any()) } returns 0
+
+        productoRepository = mockk()
+        viewModel = ProductoViewModel(productoRepository)
+    }
+
+    @After
+    fun tearDown() {
+        // Se limpia el dispatcher principal DESPUÉS de cada prueba.
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun `estadoInicial_debeEstarVacio`() {
-        // Given - Estado inicial del ViewModel
-        
-        // When - Verificamos los valores iniciales
-        val productos = viewModel.productos.value
-        val isLoading = viewModel.isLoading.value
-        val hasError = viewModel.hasError.value
-        
-        // Then - Debe estar en estado inicial
-        assertTrue("La lista debe estar vacía inicialmente", productos.isEmpty())
-        assertFalse("No debe estar cargando inicialmente", isLoading)
-        assertFalse("No debe haber error inicialmente", hasError)
-    }
+    fun `cargarProductos cuando el repositorio es exitoso, emite los estados correctos`() = runTest {
+        val listaProductosMock = listOf(mockk<ProductoApi>(relaxed = true))
+        coEvery { productoRepository.obtenerProductos(any()) } returns flowOf(listaProductosMock)
 
-    @Test
-    fun `cargarProductos_debeActivarEstadoDeCarga`() = runTest {
-        // Given - ViewModel en estado inicial
-        
-        // When - Iniciamos carga de productos
         viewModel.cargarProductos()
-        
-        // Then - Debe activar el estado de loading al inicio
-        // Nota: En la implementación real, isLoading se activa momentáneamente
-        // Este test verifica la lógica del ViewModel
-        assertNotNull("El ViewModel debe estar inicializado", viewModel)
+        // Es necesario avanzar el dispatcher para que la coroutine se ejecute.
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.isLoading.value)
+        assertFalse(viewModel.hasError.value)
+        assertEquals(listaProductosMock, viewModel.productos.value)
     }
 
     @Test
-    fun `reintentar_debeLlamarACargarProductos`() {
-        // Given - ViewModel inicializado
-        
-        // When - Llamamos a reintentar
-        viewModel.reintentar()
-        
-        // Then - No debe lanzar excepciones
-        assertNotNull("El método reintentar debe ejecutarse sin errores", viewModel)
-    }
+    fun `cargarProductos cuando el repositorio falla, emite el estado de error`() = runTest {
+        val mensajeError = "Error de red simulado"
+        coEvery { productoRepository.obtenerProductos(any()) } returns flow { throw RuntimeException(mensajeError) }
 
-    @Test
-    fun `productosVacios_deberiaActivarEstadoDeError`() {
-        // Given - ViewModel inicializado
-        
-        // When - Verificamos el estado cuando no hay productos
-        val hasError = viewModel.hasError.value
-        val productos = viewModel.productos.value
-        
-        // Then - Si no hay productos, podría considerarse un error
-        // Esta lógica depende de la implementación específica
-        assertTrue("Lista vacía inicialmente", productos.isEmpty())
+        viewModel.cargarProductos()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.isLoading.value)
+        assertTrue(viewModel.hasError.value)
+        assertTrue(viewModel.productos.value.isEmpty())
     }
 }

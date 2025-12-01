@@ -23,8 +23,6 @@ android {
 
     signingConfigs {
         create("release") {
-            // Configuración de firma para APK release
-            // En producción, estos valores deben estar en gradle.properties o variables de entorno
             storeFile = file("../keystore/bosque-antiguo.jks")
             storePassword = "bosque2025"
             keyAlias = "bosque-antiguo-key"
@@ -72,9 +70,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    // --- Íconos extra para Material ---
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
-
 
     // --- Navegación Compose ---
     implementation("androidx.navigation:navigation-compose:2.8.3")
@@ -85,6 +81,7 @@ dependencies {
 
     // --- Persistencia local (Room + KSP) ---
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation(libs.androidx.junit.ktx)
     ksp("androidx.room:room-compiler:2.6.1")
 
     // --- DataStore Preferences ---
@@ -98,15 +95,33 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
-    // --- Testing ---
+    // =======================================================
+    // --- DEPENDENCIAS DE PRUEBAS UNITARIAS (Unit Tests) ----
+    // =======================================================
+    
+    // Core de JUnit
     testImplementation(libs.junit)
+
+    // Para probar coroutines y Flows (CORREGIDO Y ACTUALIZADO)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3") // Versión más estable
+
+    // MockK: para simular (mockear) dependencias
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    // Turbine: para probar StateFlows de forma sencilla
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
+    // Para probar componentes de Arquitectura como LiveData
     testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("androidx.test.ext:junit:1.1.5")
+
+
+    // =======================================================
+    // --- DEPENDENCIAS DE PRUEBAS DE INSTRUMENTACIÓN (UI Tests) ---
+    // =======================================================
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    }
+}
