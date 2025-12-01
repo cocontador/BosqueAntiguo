@@ -25,23 +25,24 @@ import com.example.bosqueantiguo.ui.viewmodel.VentaUiState
 @Composable
 fun CarritoScreen(
     carritoViewModel: CarritoViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToConfirmacion: () -> Unit // Nuevo parámetro para navegar a la boleta
 ) {
     val carritoItems by carritoViewModel.carritoItems.collectAsState()
     val totalPrecio by carritoViewModel.totalPrecio.collectAsState()
     val ventaState by carritoViewModel.ventaState.collectAsState()
     val context = LocalContext.current
 
+    // Efecto para manejar la navegación tras el pago
     LaunchedEffect(ventaState) {
         when (val state = ventaState) {
             is VentaUiState.Success -> {
-                Toast.makeText(context, "Venta registrada con éxito! ID: ${state.venta.id}", Toast.LENGTH_LONG).show()
-                carritoViewModel.resetVentaState()
-                onNavigateBack()
+                // Navega a la pantalla de confirmación en lugar de mostrar un Toast
+                onNavigateToConfirmacion()
             }
             is VentaUiState.Error -> {
                 Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_LONG).show()
-                carritoViewModel.resetVentaState()
+                // El ViewModel debe ser reseteado desde la propia pantalla para evitar loops
             }
             else -> Unit
         }
@@ -72,6 +73,7 @@ fun CarritoScreen(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
+                // Sección de Total y Botón de Pago
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("Total:", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                     Text(String.format("$%.2f", totalPrecio), fontSize = 22.sp, fontWeight = FontWeight.Bold)

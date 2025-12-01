@@ -15,15 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +27,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.bosqueantiguo.R
+import com.example.bosqueantiguo.ui.viewmodel.CarritoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,17 +39,28 @@ fun MainScreen(
     onNavigateToResumen: () -> Unit,
     onNavigateToClima: () -> Unit,
     onNavigateToCarrito: () -> Unit,
-    onNavigateToLogin: () -> Unit // Parámetro para el login
+    onNavigateToLogin: () -> Unit,
+    carritoViewModel: CarritoViewModel // Necesario para el contador del carrito
 ) {
+    val carritoItems by carritoViewModel.carritoItems.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { /* Texto eliminado */ },
                 actions = {
-                    IconButton(onClick = onNavigateToCarrito) {
-                        Icon(Icons.Filled.ShoppingCart, contentDescription = "Carrito de compras")
+                    // Ícono del Carrito con Badge
+                    BadgedBox(badge = {
+                        if (carritoItems.isNotEmpty()) {
+                            Badge { Text(carritoItems.size.toString()) }
+                        }
+                    }) {
+                        IconButton(onClick = onNavigateToCarrito) {
+                            Icon(Icons.Filled.ShoppingCart, contentDescription = "Carrito de compras")
+                        }
                     }
-                    // Restaurado: IconButton para Login/Perfil
+                    
+                    // Ícono de Login/Perfil
                     IconButton(onClick = onNavigateToLogin) {
                         Icon(Icons.Filled.Person, contentDescription = "Iniciar Sesión")
                     }
@@ -74,7 +82,7 @@ fun MainScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding) // Aplicamos el padding del Scaffold
+                .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

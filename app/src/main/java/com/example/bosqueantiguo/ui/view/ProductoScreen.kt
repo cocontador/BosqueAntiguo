@@ -5,7 +5,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddShoppingCart
@@ -19,7 +19,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bosqueantiguo.model.ProductoApi
 import com.example.bosqueantiguo.ui.viewmodel.CarritoViewModel
 import com.example.bosqueantiguo.ui.viewmodel.ProductoViewModel
@@ -45,10 +44,7 @@ fun ProductoScreen(
                 title = { Text("Catálogo de Productos") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
-                        )
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 actions = {
@@ -64,25 +60,19 @@ fun ProductoScreen(
                             ),
                             label = "refresh_rotation"
                         )
-                        Icon(
-                            imageVector = Icons.Filled.Refresh,
-                            contentDescription = "Actualizar",
-                            modifier = Modifier.rotate(rotation)
-                        )
+                        Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Actualizar", modifier = Modifier.rotate(rotation))
                     }
                 }
             )
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) {
             when {
                 isLoading -> LoadingContent()
                 hasError -> ErrorContent(onRetry = { productoViewModel.reintentar() })
-                productos.isEmpty() -> EmptyContent()
+                productos.isEmpty() && !isLoading -> EmptyContent()
                 else -> ProductosContent(productos = productos, carritoViewModel = carritoViewModel)
             }
         }
@@ -108,7 +98,6 @@ private fun ErrorContent(onRetry: () -> Unit) {
             Text("Busca etiquetas: ProductoViewModel, ProductoRepository, RetrofitConfig", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = onRetry) { Text("Reintentar") }
-            OutlinedButton(onClick = { com.example.bosqueantiguo.network.NetworkTester.probarConectividad() }) { Text("Probar Conectividad") }
         }
     }
 }
@@ -126,33 +115,21 @@ private fun ProductosContent(productos: List<ProductoApi>, carritoViewModel: Car
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        itemsIndexed(productos) { index, producto ->
-            AnimatedVisibility(
-                visible = true,
-                enter = slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(durationMillis = 300, delayMillis = index * 50)) + fadeIn(animationSpec = tween(durationMillis = 300, delayMillis = index * 50))
-            ) {
-                ProductoApiCard(producto = producto, onAddToCart = { carritoViewModel.agregarProducto(it) })
-            }
+        items(items = productos, key = { it.id }) { producto ->
+            ProductoApiCard(producto = producto, onAddToCart = { carritoViewModel.agregarProducto(producto) })
         }
     }
 }
 
 @Composable
 private fun ProductoApiCard(producto: ProductoApi, onAddToCart: (ProductoApi) -> Unit) {
-    var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "card_scale"
-    )
-
     Card(
-        modifier = Modifier.fillMaxWidth().scale(scale),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(text = producto.codigo ?: "P${producto.id}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                Text(text = "ID: ${producto.id}", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                 producto.categoria?.let {
                     Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.secondaryContainer) {
                         Text(text = it.nombre, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
@@ -166,7 +143,8 @@ private fun ProductoApiCard(producto: ProductoApi, onAddToCart: (ProductoApi) ->
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "$${String.format("%,.0f", producto.precio)}",
+                    // CORRECCIÓN FINAL Y DEFINITIVA: Se usa %.2f para mostrar siempre dos decimales.
+                    text = String.format("$%.2f", producto.precio),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )

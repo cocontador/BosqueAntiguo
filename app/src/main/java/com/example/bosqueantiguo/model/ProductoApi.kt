@@ -1,24 +1,50 @@
 package com.example.bosqueantiguo.model
 
+import com.google.gson.annotations.SerializedName
+
 /**
- * Modelo de datos para productos que vienen de la API
- * Representa la estructura JSON del microservicio de productos
+ * Modelo de datos para productos que vienen de la API.
+ * CORREGIDO con @SerializedName en todos los campos para máxima robustez.
  */
 data class ProductoApi(
+    @SerializedName("id")
     val id: Long,
-    val codigo: String? = null,  // Puede ser null
+    
+    @SerializedName("nombre")
     val nombre: String,
-    val descripcion: String? = null,  // Puede ser null
-    val precio: Double,  // Changed from Int to Double to match API
+    
+    @SerializedName("descripcion")
+    val descripcion: String?,
+    
+    @SerializedName("precio")
+    val precio: Double,
+    
+    @SerializedName("imagenUrl")
+    val imagenUrl: String?,
+    
+    @SerializedName("disponible")
+    val disponible: Boolean,
+    
+    @SerializedName("stock")
     val stock: Int,
-    val categoria: Categoria? = null  // Puede ser null
+    
+    @SerializedName("stockCritico")
+    val stockCritico: Int,
+    
+    @SerializedName("categoria")
+    val categoria: Categoria?
 )
 
 /**
- * Modelo para las categorías de productos
+ * Modelo para las categorías de productos.
  */
 data class Categoria(
+    @SerializedName("id")
     val id: Long,
+    
+    @SerializedName("nombre")
     val nombre: String,
+    
+    @SerializedName("descripcion")
     val descripcion: String? = null
 )
